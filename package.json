@@ -13,6 +13,6 @@
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.5.4",
-    "@unb-agil/eslint-prettier-config": "*"
+    "@unb-agil/eslint-config": "*"
   }
 }

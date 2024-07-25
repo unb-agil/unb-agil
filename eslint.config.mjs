@@ -1,3 +1,3 @@
-import eslintConfigPrettier from '@unb-agil/eslint-prettier-config';
+import eslintConfigPrettier from '@unb-agil/eslint-config';
 
 export default eslintConfigPrettier;

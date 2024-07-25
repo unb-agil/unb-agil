@@ -1,5 +1,5 @@
 {
-  "name": "@unb-agil/eslint-prettier-config",
+  "name": "@unb-agil/eslint-config",
   "version": "1.0.0",
   "main": "eslint.config.mjs",
   "license": "MIT",
