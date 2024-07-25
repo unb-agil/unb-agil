@@ -1,0 +1,14 @@
+{
+  "name": "@unb-agil/eslint-prettier-config",
+  "version": "1.0.0",
+  "main": "eslint.config.mjs",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.7.0",
+    "@types/eslint__js": "^8.42.3",
+    "eslint": "^9.7.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "3.3.3",
+    "typescript-eslint": "^7.17.0"
+  }
+}

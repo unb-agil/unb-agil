@@ -10,5 +10,9 @@
     "Irwin Schmitt <irwinschmitt@gmail.com>",
     "João Paulo Coelho <atualizar@hotmail.com>"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "@unb-agil/eslint-prettier-config": "*"
+  }
 }
