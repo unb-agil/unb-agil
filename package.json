@@ -1,0 +1,14 @@
+{
+  "name": "unb-agil",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "authors": [
+    "Irwin Schmitt <irwinschmitt@gmail.com>",
+    "João Paulo Coelho <atualizar@hotmail.com>"
+  ],
+  "license": "MIT"
+}
