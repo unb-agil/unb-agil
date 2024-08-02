@@ -8,5 +8,6 @@ const scrapeController = new ScrapeController();
 
   // Uncomment to scrape individual domains
   // await scrapeController.scrapeDepartment();
+  // await scrapeController.scrapeProgram();
   // Add other individual scrape methods as needed
 })();

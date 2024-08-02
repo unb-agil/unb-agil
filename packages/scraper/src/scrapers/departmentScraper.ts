@@ -26,8 +26,6 @@ class DepartmentScraper {
 
       const departmentIds = await page.$$eval(optionsSelector, this.extractIds);
 
-      await page.close();
-
       return departmentIds;
     } catch (error) {
       console.error('Error fetching department IDs:', error);
@@ -47,8 +45,6 @@ class DepartmentScraper {
 
       const acronym = await page.$eval('h1', (element) => element.textContent);
       const title = await page.$eval('h2', (element) => element.textContent);
-
-      await page.close();
 
       if (!acronym || !title) {
         return;

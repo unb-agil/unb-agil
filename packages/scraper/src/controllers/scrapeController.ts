@@ -1,10 +1,13 @@
-import DepartmentScraper from '@/scrapers/departmentScraper';
 import puppeteerSetup from '@/config/puppeteer';
+
+import DepartmentScraper from '@/scrapers/departmentScraper';
+import ProgramScraper from '@/scrapers/programScraper';
 
 class ScrapeController {
   async scrapeAll(): Promise<void> {
     const scrapers = [
       new DepartmentScraper(),
+      new ProgramScraper(),
       // Add other scrapers as needed
     ];
 
@@ -18,6 +21,12 @@ class ScrapeController {
   async scrapeDepartment(): Promise<void> {
     const departmentScraper = new DepartmentScraper();
     await departmentScraper.scrape();
+    await puppeteerSetup.closeBrowser();
+  }
+
+  async scrapeProgram(): Promise<void> {
+    const programScraper = new ProgramScraper();
+    await programScraper.scrape();
     await puppeteerSetup.closeBrowser();
   }
 
