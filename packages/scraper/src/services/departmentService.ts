@@ -1,6 +1,10 @@
 class DepartmentService {
-  async createDepartment(departmentId: number): Promise<void> {
-    console.log(`Creating department with ID: ${departmentId}`);
+  async createDepartment(
+    id: number,
+    acronym: string,
+    title: string,
+  ): Promise<void> {
+    console.log(`Creating department: ${id} - ${acronym} - ${title}`);
   }
 }
 

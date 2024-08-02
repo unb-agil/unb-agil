@@ -1,6 +1,7 @@
 import puppeteerSetup from '@/config/puppeteer';
 import DepartmentService from '@/services/departmentService';
 import { COMPONENTS_LINK } from '@/constants';
+import { getDepartmentPresentationUrl } from '@/utils/urls';
 
 class DepartmentScraper {
   private departmentService: DepartmentService;
@@ -9,55 +10,69 @@ class DepartmentScraper {
     this.departmentService = new DepartmentService();
   }
 
+  private extractIds(options: HTMLOptionElement[]): number[] {
+    return options
+      .map((option) => parseInt(option.getAttribute('value') || '0', 10))
+      .filter((id) => !isNaN(id));
+  }
+
   async getDepartmentIds(): Promise<number[]> {
     const page = await puppeteerSetup.newPage();
 
-    await page.goto(COMPONENTS_LINK);
+    try {
+      await page.goto(COMPONENTS_LINK);
 
-    const departmentIds = await page.$$eval(
-      "select[id='form:unidades'] option",
-      (elements) => {
-        const ids: number[] = [];
+      const optionsSelector = "select[id='form:unidades'] option";
 
-        for (const element of elements) {
-          const value = element.getAttribute('value');
+      const departmentIds = await page.$$eval(optionsSelector, this.extractIds);
 
-          if (value === null) {
-            continue;
-          }
+      await page.close();
 
-          const id = parseInt(value, 10);
+      return departmentIds;
+    } catch (error) {
+      console.error('Error fetching department IDs:', error);
 
-          if (id <= 0) {
-            continue;
-          }
-
-          ids.push(id);
-        }
-
-        return ids;
-      },
-    );
-
-    await page.close();
-
-    return departmentIds;
+      return [];
+    } finally {
+      await page.close();
+    }
   }
 
   async scrapeDepartment(departmentId: number): Promise<void> {
     const page = await puppeteerSetup.newPage();
 
-    await page.goto(`https://www.example.com`);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await page.close();
+    try {
+      const presentationUrl = getDepartmentPresentationUrl(departmentId);
+      await page.goto(presentationUrl);
 
-    await this.departmentService.createDepartment(departmentId);
+      const acronym = await page.$eval('h1', (element) => element.textContent);
+      const title = await page.$eval('h2', (element) => element.textContent);
+
+      await page.close();
+
+      if (!acronym || !title) {
+        return;
+      }
+
+      await this.departmentService.createDepartment(
+        departmentId,
+        acronym,
+        title,
+      );
+    } catch (error) {
+      console.error(`Error scraping department ${departmentId}:`, error);
+    } finally {
+      await page.close();
+    }
   }
 
   async scrape(): Promise<void> {
     const departmentIds = await this.getDepartmentIds();
 
-    console.log(`Department ids: ${departmentIds}`);
+    for (const departmentId of departmentIds) {
+      await this.scrapeDepartment(departmentId);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
   }
 }
 
