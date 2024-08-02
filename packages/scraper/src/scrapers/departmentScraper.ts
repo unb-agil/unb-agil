@@ -1,6 +1,6 @@
-import puppeteerSetup from '../config/puppeteer';
-import DepartmentService from '../services/departmentService';
-import { COMPONENTS_LINK } from '../constants';
+import puppeteerSetup from '@/config/puppeteer';
+import DepartmentService from '@/services/departmentService';
+import { COMPONENTS_LINK } from '@/constants';
 
 class DepartmentScraper {
   private departmentService: DepartmentService;

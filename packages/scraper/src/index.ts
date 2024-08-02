@@ -1,4 +1,4 @@
-import ScrapeController from './controllers/scrapeController';
+import ScrapeController from '@/controllers/scrapeController';
 
 const scrapeController = new ScrapeController();
 

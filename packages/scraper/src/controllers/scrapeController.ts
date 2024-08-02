@@ -1,5 +1,5 @@
-import DepartmentScraper from '../scrapers/departmentScraper';
-import puppeteerSetup from '../config/puppeteer';
+import DepartmentScraper from '@/scrapers/departmentScraper';
+import puppeteerSetup from '@/config/puppeteer';
 
 class ScrapeController {
   async scrapeAll(): Promise<void> {
