@@ -10,6 +10,9 @@
     "puppeteer": "^22.14.0"
   },
   "devDependencies": {
-    "@types/puppeteer": "^7.0.4"
+    "@unb-agil/typescript-config": "*",
+    "@unb-agil/eslint-config": "*",
+    "@types/puppeteer": "^7.0.4",
+    "typescript": "^5.5.4"
   }
 }
