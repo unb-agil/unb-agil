@@ -4,15 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node index.ts"
+    "start": "ts-node src/index.ts"
   },
   "dependencies": {
     "puppeteer": "^22.14.0"
   },
   "devDependencies": {
-    "@unb-agil/typescript-config": "*",
-    "@unb-agil/eslint-config": "*",
     "@types/puppeteer": "^7.0.4",
-    "typescript": "^5.5.4"
+    "@unb-agil/eslint-config": "*",
+    "@unb-agil/typescript-config": "*"
   }
 }
