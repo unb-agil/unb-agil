@@ -1,4 +1,8 @@
 class ProgramService {
+  async getAllIds(): Promise<number[]> {
+    return [414924, 414916];
+  }
+
   async createProgram(
     id: number,
     title: string,

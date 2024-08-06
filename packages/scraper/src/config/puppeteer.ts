@@ -5,7 +5,13 @@ class PuppeteerSetup {
 
   async getBrowser(): Promise<Browser> {
     if (!this.browser) {
-      this.browser = await puppeteer.launch({ headless: false });
+      this.browser = await puppeteer.launch({
+        headless: false,
+        defaultViewport: {
+          width: 1500,
+          height: 1080,
+        },
+      });
     }
 
     return this.browser;

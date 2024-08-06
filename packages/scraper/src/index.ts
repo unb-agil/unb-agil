@@ -9,5 +9,6 @@ const scrapeController = new ScrapeController();
   // Uncomment to scrape individual domains
   // await scrapeController.scrapeDepartment();
   // await scrapeController.scrapeProgram();
+  // await scrapeController.scrapeCurriculum([414924]); // Engenharia de Software
   // Add other individual scrape methods as needed
 })();

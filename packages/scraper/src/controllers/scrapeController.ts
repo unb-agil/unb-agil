@@ -1,4 +1,5 @@
 import puppeteerSetup from '@/config/puppeteer';
+import CurriculumScraper from '@/scrapers/curriculumScraper';
 
 import DepartmentScraper from '@/scrapers/departmentScraper';
 import ProgramScraper from '@/scrapers/programScraper';
@@ -30,7 +31,11 @@ class ScrapeController {
     await puppeteerSetup.closeBrowser();
   }
 
-  // Add other individual scrape methods as needed
+  async scrapeCurriculum(programIds?: number[]): Promise<void> {
+    const curriculumScraper = new CurriculumScraper();
+    await curriculumScraper.scrape(programIds);
+    await puppeteerSetup.closeBrowser();
+  }
 }
 
 export default ScrapeController;
