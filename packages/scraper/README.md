@@ -17,7 +17,7 @@ O **primeiro dado** relacionado a uma entidade a ser obtido deve ser seu **ID**.
 
 As estratégias estão listadas em ordem de **granularidade** de modo que as marcações `MVP` também devem **implementar os itens seguintes**. Isso irá ajudar em consultas por entidades avulsas.
 
-## Possíveis cenários e MVP
+## Estratégias de scraping e MVP
 
 Há inúmeros cenários e estratégias para extrair os dados do SIGAA. Para que a implementação não perca o foco da etapa atual, apenas as estratégias relevantes para o MVP serão feitas no momento.
 
