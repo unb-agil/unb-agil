@@ -1,7 +1,8 @@
+import BaseScraper from '@/scrapers/baseScraper';
 import puppeteerSetup from '@/config/puppeteer';
-import { GRADUATION_PROGRAMS_URL } from '@/constants';
 import DepartmentService from '@/services/departmentService';
 import ProgramService from '@/services/programService';
+import { GRADUATION_PROGRAMS_URL } from '@/constants';
 
 interface ScrapedProgram {
   id: number;
@@ -13,7 +14,7 @@ interface ScrapedProgram {
   departmentTitle: string;
 }
 
-class ProgramScraper {
+class ProgramScraper implements BaseScraper {
   private departmentService: DepartmentService;
   private programService: ProgramService;
 

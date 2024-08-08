@@ -1,9 +1,11 @@
 import { Page } from 'puppeteer';
+
+import BaseScraper from '@/scrapers/baseScraper';
 import puppeteerSetup from '@/config/puppeteer';
 import ProgramService from '@/services/programService';
 import { getProgramCurriculaUrl } from '@/utils/urls';
 
-class CurriculumScraper {
+class CurriculumScraper implements BaseScraper {
   private programService: ProgramService;
   // private curriculumService: CurriculumService;
 

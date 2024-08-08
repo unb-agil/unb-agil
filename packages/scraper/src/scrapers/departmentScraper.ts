@@ -1,15 +1,16 @@
 import { Page } from 'puppeteer';
 
+import BaseScraper from '@/scrapers/baseScraper';
 import puppeteerSetup from '@/config/puppeteer';
 import DepartmentService from '@/services/departmentService';
+import { getDepartmentPresentationUrl } from '@/utils/urls';
+import { COMPONENTS_LINK } from '@/constants';
 import {
   DepartmentDetails,
   DepartmentScraperOptions,
 } from '@/models/departmentModels';
-import { getDepartmentPresentationUrl } from '@/utils/urls';
-import { COMPONENTS_LINK } from '@/constants';
 
-class DepartmentScraper {
+class DepartmentScraper implements BaseScraper {
   private departmentIds: number[];
   private departmentService: DepartmentService;
 
