@@ -4,36 +4,20 @@ import CurriculumScraper from '@/scrapers/curriculumScraper';
 import DepartmentScraper from '@/scrapers/departmentScraper';
 import ProgramScraper from '@/scrapers/programScraper';
 
+const FGA_DEPARTMENT_ID = 673;
+
 class ScrapeController {
   async scrapeAll(): Promise<void> {
     const scrapers = [
-      new DepartmentScraper(),
+      new DepartmentScraper({ departmentIds: [FGA_DEPARTMENT_ID] }),
       new ProgramScraper(),
-      // Add other scrapers as needed
+      new CurriculumScraper(),
     ];
 
     for (const scraper of scrapers) {
       await scraper.scrape();
     }
 
-    await puppeteerSetup.closeBrowser();
-  }
-
-  async scrapeDepartment(): Promise<void> {
-    const departmentScraper = new DepartmentScraper();
-    await departmentScraper.scrape();
-    await puppeteerSetup.closeBrowser();
-  }
-
-  async scrapeProgram(): Promise<void> {
-    const programScraper = new ProgramScraper();
-    await programScraper.scrape();
-    await puppeteerSetup.closeBrowser();
-  }
-
-  async scrapeCurriculum(programIds?: number[]): Promise<void> {
-    const curriculumScraper = new CurriculumScraper();
-    await curriculumScraper.scrape(programIds);
     await puppeteerSetup.closeBrowser();
   }
 }

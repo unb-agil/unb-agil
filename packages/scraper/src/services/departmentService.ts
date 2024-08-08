@@ -5,7 +5,7 @@ class DepartmentService {
     console.log(`Storing department ID: ${departmentId}`);
   }
 
-  async getDepartmentIds(): Promise<number[]> {
+  async fetchAllDepartmentIds(): Promise<number[]> {
     return await Promise.resolve([673]);
   }
 

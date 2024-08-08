@@ -2,14 +2,21 @@ import { Page } from 'puppeteer';
 
 import puppeteerSetup from '@/config/puppeteer';
 import DepartmentService from '@/services/departmentService';
-import { DepartmentDetails } from '@/models/departmentModels';
+import {
+  DepartmentDetails,
+  DepartmentScraperOptions,
+} from '@/models/departmentModels';
 import { getDepartmentPresentationUrl } from '@/utils/urls';
 import { COMPONENTS_LINK } from '@/constants';
 
 class DepartmentScraper {
+  private departmentIds: number[];
   private departmentService: DepartmentService;
 
-  constructor() {
+  constructor(options?: DepartmentScraperOptions) {
+    const { departmentIds = [] } = options || {};
+
+    this.departmentIds = departmentIds;
     this.departmentService = new DepartmentService();
   }
 
@@ -31,9 +38,9 @@ class DepartmentScraper {
 
     try {
       await page.goto(COMPONENTS_LINK);
-      const departmentIds = await this.extractDepartmentIds(page);
+      this.departmentIds = await this.extractDepartmentIds(page);
 
-      for (const departmentId of departmentIds) {
+      for (const departmentId of this.departmentIds) {
         await this.departmentService.storeDepartmentId(departmentId);
       }
     } catch (error) {
@@ -62,8 +69,16 @@ class DepartmentScraper {
     await this.departmentService.storeDepartmentDetails(departmentId, details);
   }
 
+  private async getDepartmentIds(): Promise<number[]> {
+    if (this.departmentIds.length === 0) {
+      this.departmentIds = await this.departmentService.fetchAllDepartmentIds();
+    }
+
+    return this.departmentIds;
+  }
+
   async scrapeAllDepartmentDetails(): Promise<void> {
-    const departmentIds = await this.departmentService.getDepartmentIds();
+    const departmentIds = await this.getDepartmentIds();
 
     for (const departmentId of departmentIds) {
       await this.scrapeDepartmentDetails(departmentId);
@@ -72,7 +87,10 @@ class DepartmentScraper {
   }
 
   async scrape(): Promise<void> {
-    await this.scrapeAllDepartmentIds();
+    if (this.departmentIds.length === 0) {
+      await this.scrapeAllDepartmentIds();
+    }
+
     await this.scrapeAllDepartmentDetails();
   }
 }
