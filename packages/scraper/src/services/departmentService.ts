@@ -1,10 +1,23 @@
+import { DepartmentDetails } from '@/models/departmentModels';
+
 class DepartmentService {
-  async createDepartment(
-    id: number,
-    acronym: string,
-    title: string,
+  async storeDepartmentId(departmentId: number): Promise<void> {
+    console.log(`Storing department ID: ${departmentId}`);
+  }
+
+  async getDepartmentIds(): Promise<number[]> {
+    return await Promise.resolve([673]);
+  }
+
+  async storeDepartmentDetails(
+    departmentId: number,
+    departmentDetails: DepartmentDetails,
   ): Promise<void> {
-    console.log(`Creating department: ${id} - ${acronym} - ${title}`);
+    const { acronym, title } = departmentDetails;
+
+    console.log(
+      `Storing department details: ${departmentId} - ${acronym} - ${title}`,
+    );
   }
 }
 
