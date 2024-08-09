@@ -10,7 +10,7 @@ class ScrapeController {
   async scrapeAll(): Promise<void> {
     const scrapers = [
       new DepartmentScraper({ departmentIds: [FGA_DEPARTMENT_ID] }),
-      new ProgramScraper(),
+      new ProgramScraper({ programIds: [414924] }),
       new CurriculumScraper(),
     ];
 

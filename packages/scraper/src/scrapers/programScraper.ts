@@ -1,111 +1,89 @@
+import { Page } from 'puppeteer';
 import BaseScraper from '@/scrapers/baseScraper';
 import puppeteerSetup from '@/config/puppeteer';
-import DepartmentService from '@/services/departmentService';
 import ProgramService from '@/services/programService';
 import { GRADUATION_PROGRAMS_URL } from '@/constants';
-
-interface ScrapedProgram {
-  id: number;
-  title: string;
-  degree: string;
-  shift: string;
-  campus: string;
-  departmentAcronym: string;
-  departmentTitle: string;
-}
+import { getProgramPresentationUrl } from '@/utils/urls';
+import { ProgramScraperOptions } from '@/models/programModels';
 
 class ProgramScraper implements BaseScraper {
-  private departmentService: DepartmentService;
+  private programIds: number[];
   private programService: ProgramService;
 
-  constructor() {
-    this.departmentService = new DepartmentService();
+  constructor(options?: ProgramScraperOptions) {
+    const { programIds = [] } = options || {};
+
+    this.programIds = programIds;
     this.programService = new ProgramService();
   }
 
-  async extractPrograms(
-    rows: HTMLTableRowElement[],
-  ): Promise<ScrapedProgram[]> {
-    let currentDepartmentTitle = '';
-    let departmentAcronym = '';
-    let departmentTitle = '';
-
-    const cleanText = (text: string | null) =>
-      text?.replace(/[\n\t]/g, '').trim() || '';
-
-    const result: ScrapedProgram[] = [];
-
-    for (const row of rows) {
-      const columns = row.querySelectorAll('td');
-
-      if (!row.classList.length) {
-        currentDepartmentTitle = cleanText(row.textContent);
-        departmentAcronym = currentDepartmentTitle.split(' - ')[0];
-        departmentTitle = currentDepartmentTitle.split(' - ')[1];
-        continue;
-      }
-
-      if (
-        row.classList.contains('linhaImpar') ||
-        row.classList.contains('linhaPar')
-      ) {
-        const title = cleanText(columns[0].textContent);
-        const degree = cleanText(columns[1].textContent);
-        const shift = cleanText(columns[2].textContent);
-        const campus = cleanText(columns[3].textContent);
-        const id = parseInt(
-          columns[6].querySelector('a')?.getAttribute('href')?.split('=')[1] ||
-            '0',
-          10,
-        );
-
-        result.push({
-          id,
-          title,
-          degree,
-          shift,
-          campus,
-          departmentAcronym,
-          departmentTitle,
-        });
-      }
+  async scrape() {
+    if (this.programIds.length === 0) {
+      await this.scrapeAllProgramIds();
     }
 
-    return result;
+    await this.scrapeAllProgramDetails();
   }
 
-  async scrapeAllPrograms(): Promise<ScrapedProgram[]> {
+  async scrapeAllProgramIds(): Promise<void> {
     const page = await puppeteerSetup.newPage();
+    await page.goto(GRADUATION_PROGRAMS_URL);
 
-    try {
-      await page.goto(GRADUATION_PROGRAMS_URL);
+    const programIds = await this.extractProgramIds(page);
+    await this.programService.storeProgramIds(programIds);
+  }
 
-      const programs = await page.$$eval('tr', this.extractPrograms, page);
+  async scrapeAllProgramDetails(): Promise<void> {
+    this.programIds = await this.getProgramIds();
 
-      return programs;
-    } catch (error) {
-      console.error('Error scraping programs:', error);
-
-      return [];
-    } finally {
-      await page.close();
+    for (const programId of this.programIds) {
+      await this.scrapeProgramDetails(programId);
     }
   }
 
-  async scrape(): Promise<void> {
-    const programs = await this.scrapeAllPrograms();
+  async scrapeProgramDetails(programId: number): Promise<void> {
+    const page = await puppeteerSetup.newPage();
+    const url = getProgramPresentationUrl(programId);
+    await page.goto(url);
 
-    for (const program of programs) {
-      await this.programService.createProgram(
-        program.id,
-        program.title,
-        program.degree,
-        program.shift,
-        program.campus,
-        program.departmentAcronym,
-        program.departmentTitle,
-      );
+    const title = await this.extractProgramTitle(page);
+    const departmentId = await this.extractProgramDepartmentId(page);
+
+    await this.programService.storeProgram(title, departmentId);
+  }
+
+  private async extractProgramIds(page: Page): Promise<number[]> {
+    const selector = 'a[title="Visualizar Página do Curso"]';
+    const programIds = await page.$$eval(selector, (anchors) =>
+      anchors.map((anchors) => {
+        const href = anchors.getAttribute('href') || '';
+
+        return parseInt(href.split('=')[1], 10);
+      }),
+    );
+
+    return programIds;
+  }
+
+  private async getProgramIds(): Promise<number[]> {
+    if (this.programIds.length === 0) {
+      return await this.programService.fetchProgramIds();
     }
+
+    return this.programIds;
+  }
+
+  private async extractProgramTitle(page: Page): Promise<string> {
+    return page.$eval(
+      'span.nome_curso',
+      (element) => element.innerText.split(' / ')[0].split('CURSO DE ')[1],
+    );
+  }
+
+  private async extractProgramDepartmentId(page: Page): Promise<number> {
+    return page.$eval('span.nome_centro a', (element) =>
+      parseInt(element.getAttribute('href')?.split('id=')[1] || '0', 10),
+    );
   }
 }
 

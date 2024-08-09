@@ -1,20 +1,18 @@
 class ProgramService {
-  async getAllIds(): Promise<number[]> {
-    return [414924, 414916];
+  async storeProgramIds(programIds: number[]): Promise<void> {
+    console.log(`Storing program ids: ${programIds.join(', ')}`);
   }
 
-  async createProgram(
-    id: number,
-    title: string,
-    degree: string,
-    shift: string,
-    campus: string,
-    departmentAcronym: string,
-    departmentTitle: string,
-  ): Promise<void> {
-    console.log(
-      `Creating program: ${departmentAcronym} - ${departmentTitle} - ${id} - ${title} - ${degree} - ${shift} - ${campus}`,
-    );
+  async storeProgram(title: string, departmentId: number): Promise<void> {
+    console.log(`Storing program details: ${title} - ${departmentId}`);
+  }
+
+  async fetchProgramIds(): Promise<number[]> {
+    return [414924];
+  }
+
+  async getAllIds(): Promise<number[]> {
+    return [414924, 414916];
   }
 }
 
