@@ -1,12 +1,17 @@
+import 'reflect-metadata';
 import express from 'express';
+import { createConnection } from 'typeorm';
+import departmentRoutes from '@/routes/departmentRoutes';
 
 const app = express();
-const port = 3000;
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
+createConnection()
+  .then(async () => {
+    app.use('/departments', departmentRoutes);
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+    app.listen(3000, () => {
+      console.log('Server is running on port 3000');
+    });
+  })
+  .catch((error) => console.log(error));
