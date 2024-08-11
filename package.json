@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "private": true,
+  "type": "module",
   "workspaces": [
     "packages/*"
   ],
@@ -12,9 +13,11 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@commitlint/cli": "^19.4.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@unb-agil/eslint-config": "*",
     "husky": "^9.1.4",
-    "lint-staged": "^15.2.8",
-    "@unb-agil/eslint-config": "*"
+    "lint-staged": "^15.2.8"
   },
   "scripts": {
     "prepare": "husky"
