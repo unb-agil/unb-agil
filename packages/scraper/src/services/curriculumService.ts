@@ -17,6 +17,10 @@ class CurriculumService {
   async storeCurriculumDetails(details: CurriculumDetails): Promise<void> {
     console.log('Storing curriculum details:', details);
   }
+
+  async getProgramId(curriculumId: string): Promise<number> {
+    return 414924;
+  }
 }
 
 export default CurriculumService;
