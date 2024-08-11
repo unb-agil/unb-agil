@@ -10,5 +10,16 @@
     "Irwin Schmitt <irwinschmitt@gmail.com>",
     "João Paulo Coelho <atualizar@hotmail.com>"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.8",
+    "@unb-agil/eslint-config": "*"
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --fix"
+  }
 }
