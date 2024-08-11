@@ -19,6 +19,11 @@ class DepartmentService {
       `Storing department details: ${departmentId} - ${acronym} - ${title}`,
     );
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getDepartmentIdByTitle(title: string): Promise<number> {
+    return 673;
+  }
 }
 
 export default DepartmentService;
