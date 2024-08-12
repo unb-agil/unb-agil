@@ -13,6 +13,9 @@ export interface ComponentDetails {
   title: string;
   type: string;
   department: string;
+  prerequisites: string;
+  corequisites: string;
+  equivalences: string;
 }
 
 export interface Component {
@@ -20,4 +23,12 @@ export interface Component {
   title: string;
   type: ComponentType;
   departmentId: number;
+  prerequisites: RequisitesExpression;
+  corequisites: RequisitesExpression;
+  equivalences: RequisitesExpression;
 }
+
+export type RequisitesExpression =
+  | string
+  | { and: RequisitesExpression[] }
+  | { or: RequisitesExpression[] };

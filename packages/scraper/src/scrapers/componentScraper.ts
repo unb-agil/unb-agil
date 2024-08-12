@@ -4,6 +4,7 @@ import puppeteerSetup from '@/config/puppeteer';
 import BaseScraper from '@/scrapers/baseScraper';
 import DepartmentService from '@/services/departmentService';
 import ComponentService from '@/services/componentService';
+import { parseRequisites } from '@/utils/requisites';
 import {
   Component,
   ComponentDetails,
@@ -37,7 +38,7 @@ class ComponentScraper implements BaseScraper {
 
   async scrapeComponentDetails(componentId: string): Promise<void> {
     const page = await this.goToComponentPage(componentId);
-    const details = await this.extractComponentDetails(page);
+    const details = await this.extractAttributes(page);
     const component = await this.formatComponent(componentId, details);
     await this.componentService.storeComponent(component);
   }
@@ -64,22 +65,25 @@ class ComponentScraper implements BaseScraper {
     return page;
   }
 
-  private async extractComponentDetails(page: Page): Promise<ComponentDetails> {
-    const title = await this.extractComponentDetail(page, 'Nome');
-    const type = await this.extractComponentDetail(page, 'Tipo do Componente');
-    const department = await this.extractComponentDetail(page, 'Responsável');
+  private async extractAttributes(page: Page): Promise<ComponentDetails> {
+    const title = await this.extractAttribute(page, 'Nome');
+    const type = await this.extractAttribute(page, 'Tipo do Componente');
+    const department = await this.extractAttribute(page, 'Responsável');
+    const prerequisites = await this.extractAttribute(page, 'Pré-Requisitos');
+    const corequisites = await this.extractAttribute(page, 'Co-Requisitos');
+    const equivalences = await this.extractAttribute(page, 'Equivalências');
 
     return {
       title,
       type,
       department,
+      prerequisites,
+      corequisites,
+      equivalences,
     };
   }
 
-  private async extractComponentDetail(
-    page: Page,
-    detail: string,
-  ): Promise<string> {
+  private async extractAttribute(page: Page, detail: string): Promise<string> {
     const xpath = `//th[contains(text(), "${detail}")]/following-sibling::td[1]`;
 
     return await page.$eval(
@@ -97,6 +101,9 @@ class ComponentScraper implements BaseScraper {
       title: details.title,
       type: this.getComponentType(details.type),
       departmentId: await this.getDepartmentId(details.department),
+      prerequisites: parseRequisites(details.prerequisites),
+      corequisites: parseRequisites(details.corequisites),
+      equivalences: parseRequisites(details.equivalences),
     };
   }
 
