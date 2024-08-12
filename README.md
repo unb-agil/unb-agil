@@ -3,6 +3,7 @@
 ## Pacotes
 
 - [Scraper](./packages/scraper/README.md)
+- [API](./packages/api/README.md)
 
 ## Configuração do ambiente de desenvolvimento
 

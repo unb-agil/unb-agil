@@ -3,9 +3,11 @@
   "include": ["src"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "experimentalDecorators": true,
+    "outDir": "./dist",
     "emitDecoratorMetadata": true,
-    "outDir": "dist",
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "strict": false,
     "paths": {
       "@/*": ["./src/*"]
     }
