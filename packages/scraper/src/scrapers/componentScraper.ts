@@ -26,6 +26,13 @@ class ComponentScraper implements BaseScraper {
     this.componentService = new ComponentService();
   }
 
+  static async accessComponentsPage(): Promise<Page> {
+    const page = await puppeteerSetup.newPage();
+    await page.goto(COMPONENTS_LINK);
+
+    return page;
+  }
+
   async scrape(): Promise<void> {
     await this.scrapeAllComponentDetails();
   }
@@ -115,7 +122,9 @@ class ComponentScraper implements BaseScraper {
   }
 
   private async getDepartmentId(title: string) {
-    return await this.departmentService.getDepartmentIdByTitle(title);
+    const department = await this.departmentService.get({ title });
+
+    return department.id;
   }
 }
 

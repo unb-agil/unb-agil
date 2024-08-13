@@ -1,12 +1,13 @@
 import { Page } from 'puppeteer';
 
-import BaseScraper from '@/scrapers/baseScraper';
 import puppeteerSetup from '@/config/puppeteer';
+import BaseScraper from '@/scrapers/baseScraper';
+import ComponentScraper from '@/scrapers/componentScraper';
 import DepartmentService from '@/services/departmentService';
-import { getDepartmentPresentationUrl } from '@/utils/urls';
-import { COMPONENTS_LINK } from '@/constants';
+import { DEPARTMENT_PRESENTATION_BASE_URL } from '@/constants';
 import {
-  DepartmentDetails,
+  Department,
+  DepartmentData,
   DepartmentScraperOptions,
 } from '@/models/departmentModels';
 
@@ -21,78 +22,65 @@ class DepartmentScraper implements BaseScraper {
     this.departmentService = new DepartmentService();
   }
 
-  private evaluateIds(options: HTMLOptionElement[]): number[] {
-    return options
-      .map((option) => parseInt(option.getAttribute('value') || '0', 10))
-      .filter((id) => id > 0);
+  public static async accessPresentationPage(departmentId: number) {
+    const page = await puppeteerSetup.newPage();
+    const url = this.getDepartmentPresentationUrl(departmentId);
+    await page.goto(url);
+
+    return page;
   }
 
-  private async extractDepartmentIds(page: Page): Promise<number[]> {
+  public static getDepartmentPresentationUrl(departmentId: number) {
+    return `${DEPARTMENT_PRESENTATION_BASE_URL}?id=${departmentId}`;
+  }
+
+  private static async extractDepartmentIds(page: Page): Promise<number[]> {
     const optionsSelector = "select[id='form:unidades'] option";
     const departmentIds = await page.$$eval(optionsSelector, this.evaluateIds);
 
     return departmentIds;
   }
 
-  async scrapeAllDepartmentIds(): Promise<void> {
-    const page = await puppeteerSetup.newPage();
+  private static evaluateIds(options: HTMLOptionElement[]): number[] {
+    return options
+      .map((option) => parseInt(option.getAttribute('value') || '0', 10))
+      .filter((id) => id > 0);
+  }
 
-    try {
-      await page.goto(COMPONENTS_LINK);
-      this.departmentIds = await this.extractDepartmentIds(page);
+  private static async extractDepartmentData(page: Page) {
+    const data: DepartmentData = {
+      acronym: await page.$eval('h1', (element) => element.innerText),
+      title: await page.$eval('h2', (element) => element.innerText),
+    };
 
-      for (const departmentId of this.departmentIds) {
-        await this.departmentService.storeDepartmentId(departmentId);
-      }
-    } catch (error) {
-      console.error('Error fetching department IDs:', error);
-    } finally {
+    return data;
+  }
+
+  public async scrape() {
+    if (this.departmentIds.length === 0) {
+      await this.scrapeDepartmentIds();
+    }
+
+    await this.scrapeDepartmentsData();
+  }
+
+  public async scrapeDepartmentIds() {
+    const page = await ComponentScraper.accessComponentsPage();
+    this.departmentIds = await DepartmentScraper.extractDepartmentIds(page);
+    await this.departmentService.storeIds(this.departmentIds);
+
+    await page.close();
+  }
+
+  public async scrapeDepartmentsData() {
+    for (const departmentId of this.departmentIds) {
+      const page = await DepartmentScraper.accessPresentationPage(departmentId);
+      const data = await DepartmentScraper.extractDepartmentData(page);
+      const department: Department = { id: departmentId, ...data };
+      await this.departmentService.update(department);
+
       await page.close();
     }
-  }
-
-  private async extractDepartmentDetails(
-    page: Page,
-  ): Promise<DepartmentDetails> {
-    const acronym = await page.$eval('h1', (element) => element.innerText);
-    const title = await page.$eval('h2', (element) => element.innerText);
-
-    return { acronym, title };
-  }
-
-  async scrapeDepartmentDetails(departmentId: number): Promise<void> {
-    const page = await puppeteerSetup.newPage();
-    const presentationUrl = getDepartmentPresentationUrl(departmentId);
-    await page.goto(presentationUrl);
-
-    const details = await this.extractDepartmentDetails(page);
-
-    await this.departmentService.storeDepartmentDetails(departmentId, details);
-  }
-
-  private async getDepartmentIds(): Promise<number[]> {
-    if (this.departmentIds.length === 0) {
-      this.departmentIds = await this.departmentService.fetchAllDepartmentIds();
-    }
-
-    return this.departmentIds;
-  }
-
-  async scrapeAllDepartmentDetails(): Promise<void> {
-    const departmentIds = await this.getDepartmentIds();
-
-    for (const departmentId of departmentIds) {
-      await this.scrapeDepartmentDetails(departmentId);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-  }
-
-  async scrape(): Promise<void> {
-    if (this.departmentIds.length === 0) {
-      await this.scrapeAllDepartmentIds();
-    }
-
-    await this.scrapeAllDepartmentDetails();
   }
 }
 

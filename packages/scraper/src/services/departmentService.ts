@@ -1,28 +1,24 @@
-import { DepartmentDetails } from '@/models/departmentModels';
+import { Department, DepartmentParams } from '@/models/departmentModels';
 
 class DepartmentService {
-  async storeDepartmentId(departmentId: number): Promise<void> {
-    console.log(`Storing department ID: ${departmentId}`);
+  async storeIds(departmentIds: Department['id'][]): Promise<void> {
+    console.log(`Storing ${departmentIds.length} department ids`);
   }
 
-  async fetchAllDepartmentIds(): Promise<number[]> {
-    return await Promise.resolve([673]);
+  async update(department: Department) {
+    console.log(`Updating department ${department.id} (${department.title})`);
   }
 
-  async storeDepartmentDetails(
-    departmentId: number,
-    departmentDetails: DepartmentDetails,
-  ): Promise<void> {
-    const { acronym, title } = departmentDetails;
+  async get(params: DepartmentParams): Promise<Department> {
+    console.log(`Getting department with params: ${JSON.stringify(params)}`);
 
-    console.log(
-      `Storing department details: ${departmentId} - ${acronym} - ${title}`,
-    );
-  }
+    const department = {
+      id: 673,
+      acronym: 'FGA',
+      title: 'Faculdade do Gama',
+    };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getDepartmentIdByTitle(title: string): Promise<number> {
-    return 673;
+    return department;
   }
 }
 
