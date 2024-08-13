@@ -1,14 +1,10 @@
 import ScrapeController from '@/controllers/scrapeController';
 
+const FGA_DEPARTMENT_ID = 673;
 const scrapeController = new ScrapeController();
 
 (async () => {
-  // Scrape all domains
-  await scrapeController.scrapeAll();
-
-  // Uncomment to scrape individual domains
-  // await scrapeController.scrapeDepartment();
-  // await scrapeController.scrapeProgram();
-  // await scrapeController.scrapeCurriculum([414924]); // Engenharia de Software
-  // Add other individual scrape methods as needed
+  await scrapeController.scrape({
+    departmentIds: [FGA_DEPARTMENT_ID],
+  });
 })();
