@@ -41,3 +41,9 @@ yarn install
 ### Configuração do VSCode
 
 Recomenda-se utilizar a extensão Prettier para formatação de código. As configurações recomendadas para extensões estão no arquivo .vscode/extensions.json.
+
+## Scraper
+
+<p align="center">
+  <img src="./images/scraper-flowchart.png" alt="Fluxograma do Scraper">
+</p>
