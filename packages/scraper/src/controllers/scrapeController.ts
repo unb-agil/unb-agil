@@ -16,10 +16,10 @@ class ScrapeController {
 
     const scrapers = [
       new DepartmentScraper({ departmentIds }),
-      new ProgramScraper({ programIds: [ESW_PROGRAM_ID] }),
-      new CurriculumScraper({ programIds: [ESW_PROGRAM_ID] }),
-      new CurriculumComponentScraper({ curriculumIds: ESW_CURRICULUM_IDS }),
-      new ComponentScraper({ componentIds: ESW_COMPONENT_IDS }),
+      // new ProgramScraper({ programIds: [ESW_PROGRAM_ID] }),
+      // new CurriculumScraper({ programIds: [ESW_PROGRAM_ID] }),
+      // new CurriculumComponentScraper({ curriculumIds: ESW_CURRICULUM_IDS }),
+      // new ComponentScraper({ componentIds: ESW_COMPONENT_IDS }),
     ];
 
     for (const scraper of scrapers) {

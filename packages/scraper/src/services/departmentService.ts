@@ -1,23 +1,18 @@
 import { DepartmentDetails } from '@/models/departmentModels';
 
 class DepartmentService {
-  async storeDepartmentId(departmentId: number): Promise<void> {
-    console.log(`Storing department ID: ${departmentId}`);
+  async storeDepartmentIds(departmentIds: number[]): Promise<void> {
+    console.log(`Storing ${departmentIds.length} department ids`);
+  }
+
+  async storeDepartmentData(departmentId: number, data: DepartmentDetails) {
+    const { acronym, title } = data;
+
+    console.log(`Storing department data for  ${acronym} (${title})`);
   }
 
   async fetchAllDepartmentIds(): Promise<number[]> {
     return await Promise.resolve([673]);
-  }
-
-  async storeDepartmentDetails(
-    departmentId: number,
-    departmentDetails: DepartmentDetails,
-  ): Promise<void> {
-    const { acronym, title } = departmentDetails;
-
-    console.log(
-      `Storing department details: ${departmentId} - ${acronym} - ${title}`,
-    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

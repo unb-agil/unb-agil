@@ -14,6 +14,13 @@ import {
 import { COMPONENTS_LINK } from '@/constants';
 
 class ComponentScraper implements BaseScraper {
+  static async accessComponentsPage(): Promise<Page> {
+    const page = await puppeteerSetup.newPage();
+    await page.goto(COMPONENTS_LINK);
+
+    return page;
+  }
+
   private componentIds: string[];
   private departmentService: DepartmentService;
   private componentService: ComponentService;
