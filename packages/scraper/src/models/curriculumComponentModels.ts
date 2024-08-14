@@ -3,7 +3,7 @@ export interface CurriculumComponentScraperOptions {
 }
 
 export interface CurriculumComponent {
-  curriculumId: string;
+  curriculumSigaaId: string;
   componentId: string;
   isMandatory: boolean;
   recommendedPeriod?: number;

@@ -14,7 +14,7 @@ import { Program } from '@/models/programModels';
 
 class CurriculumComponentScraper implements BaseScraper {
   private programSigaaId: Program['sigaaId'];
-  private curriculumIds?: Curriculum['id'][];
+  private curriculumSigaaIds?: Curriculum['sigaaId'][];
   private curriculumService: CurriculumService;
   private curriculumComponentService: CurriculumComponentService;
 
@@ -34,14 +34,17 @@ class CurriculumComponentScraper implements BaseScraper {
     await curriculumPage.waitForNavigation();
   }
 
-  static async extractData(page: Page, curriculumId: Curriculum['id']) {
+  static async extractData(
+    page: Page,
+    curriculumSigaaId: Curriculum['sigaaId'],
+  ) {
     const electiveComponents = await this.extractElectiveComponents(page);
     const periodComponents = await this.extractPeriodComponents(page);
 
     return this.formatCurriculumComponents(
       electiveComponents,
       periodComponents,
-      curriculumId,
+      curriculumSigaaId,
     );
   }
 
@@ -92,14 +95,14 @@ class CurriculumComponentScraper implements BaseScraper {
   static formatCurriculumComponents(
     electiveComponents: string[],
     periodComponents: string[][],
-    curriculumId: Curriculum['id'],
+    curriculumSigaaId: Curriculum['sigaaId'],
   ): CurriculumComponent[] {
     const curriculumComponentsMap: Record<string, CurriculumComponent> = {};
 
     for (const elective of electiveComponents) {
       curriculumComponentsMap[elective] = {
         componentId: elective,
-        curriculumId,
+        curriculumSigaaId,
         isMandatory: false,
       };
     }
@@ -109,7 +112,7 @@ class CurriculumComponentScraper implements BaseScraper {
         if (!curriculumComponentsMap[component]) {
           curriculumComponentsMap[component] = {
             componentId: component,
-            curriculumId,
+            curriculumSigaaId,
             isMandatory: true,
             recommendedPeriod: i + 1,
           };
@@ -131,28 +134,38 @@ class CurriculumComponentScraper implements BaseScraper {
       this.programSigaaId,
     );
 
-    const curriculumIds = await CurriculumScraper.extractCurriculumIds(page);
-    await this.curriculumService.storeIds(this.programSigaaId, curriculumIds);
+    const curriculumSigaaIds =
+      await CurriculumScraper.extractCurriculumSigaaIds(page);
+    await this.curriculumService.storeIds(
+      this.programSigaaId,
+      curriculumSigaaIds,
+    );
 
-    for (const curriculumId of curriculumIds) {
-      await CurriculumScraper.accessCurriculumPage(page, curriculumId);
-      const curriculumComponents = await this.extractData(page, curriculumId);
+    for (const curriculumSigaaId of curriculumSigaaIds) {
+      await CurriculumScraper.accessCurriculumPage(page, curriculumSigaaId);
+      const curriculumComponents = await this.extractData(
+        page,
+        curriculumSigaaId,
+      );
       await this.curriculumComponentService.batchUpdate(curriculumComponents);
 
       await page.goBack();
     }
   }
 
-  async accessCurriculumComponentPage(curriculumId: Curriculum['id']) {
-    const { sigaaId } = await this.curriculumService.getProgram(curriculumId);
+  async accessCurriculumComponentPage(
+    curriculumSigaaId: Curriculum['sigaaId'],
+  ) {
+    const { sigaaId } =
+      await this.curriculumService.getProgram(curriculumSigaaId);
     const page = await ProgramScraper.accessProgramCurriculaPage(sigaaId);
-    await CurriculumScraper.accessCurriculumPage(page, curriculumId);
+    await CurriculumScraper.accessCurriculumPage(page, curriculumSigaaId);
 
     return page;
   }
 
-  async extractData(page: Page, curriculumId: Curriculum['id']) {
-    return CurriculumComponentScraper.extractData(page, curriculumId);
+  async extractData(page: Page, curriculumSigaaId: Curriculum['sigaaId']) {
+    return CurriculumComponentScraper.extractData(page, curriculumSigaaId);
   }
 }
 

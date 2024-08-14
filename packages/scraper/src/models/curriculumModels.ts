@@ -2,7 +2,7 @@ import { Program } from './programModels';
 
 export interface CurriculumScraperOptions {
   programSigaaId: Program['sigaaId'];
-  curriculumIds?: Curriculum['id'][];
+  curriculumSigaaIds?: Curriculum['sigaaId'][];
 }
 
 export interface CurriculumData {
@@ -12,5 +12,5 @@ export interface CurriculumData {
 }
 
 export interface Curriculum extends CurriculumData {
-  id: string;
+  sigaaId: string;
 }

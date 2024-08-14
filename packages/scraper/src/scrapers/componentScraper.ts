@@ -112,10 +112,10 @@ class ComponentScraper implements BaseScraper {
   async scrapeProgramComponents(programSigaaId: number): Promise<void> {
     const page =
       await ProgramScraper.accessProgramCurriculaPage(programSigaaId);
-    const curriculumIds = await CurriculumScraper.extractCurriculumIds(page);
+    const ids = await CurriculumScraper.extractCurriculumSigaaIds(page);
 
-    for (const curriculumId of curriculumIds) {
-      await CurriculumScraper.accessCurriculumPage(page, curriculumId);
+    for (const curriculumSigaaId of ids) {
+      await CurriculumScraper.accessCurriculumPage(page, curriculumSigaaId);
       const ids = await CurriculumComponentScraper.extractComponentIds(page);
       await this.componentService.saveIds(ids);
 

@@ -4,17 +4,17 @@ import { Curriculum } from '@/models/curriculumModels';
 class CurriculumService {
   async storeIds(
     programSigaaId: Program['sigaaId'],
-    curriculumIds: Curriculum['id'][],
+    curriculumSigaaIds: Curriculum['sigaaId'][],
   ) {
-    console.log(`Updating ${curriculumIds.length} curriculum ids`);
+    console.log(`Updating ${curriculumSigaaIds.length} curriculum ids`);
   }
 
   async update(curriculum: Curriculum): Promise<void> {
-    console.log(`Updating curriculum ${curriculum.id}`);
+    console.log(`Updating curriculum ${curriculum.sigaaId}`);
   }
 
-  async getProgram(curriculumId: Curriculum['id']): Promise<Program> {
-    console.log(`Getting program id for curriculum ${curriculumId}`);
+  async getProgram(curriculumSigaaId: Curriculum['sigaaId']): Promise<Program> {
+    console.log(`Getting program id for curriculum ${curriculumSigaaId}`);
 
     return {
       sigaaId: 414924,
