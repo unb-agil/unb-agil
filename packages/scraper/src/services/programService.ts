@@ -1,18 +1,12 @@
+import { Program } from '@/models/programModels';
+
 class ProgramService {
-  async storeProgramIds(programIds: number[]): Promise<void> {
-    console.log(`Storing program ids: ${programIds.join(', ')}`);
+  async storeIds(programIds: Program['id'][]): Promise<void> {
+    console.log(`Storing ${programIds.length} program ids`);
   }
 
-  async storeProgram(title: string, departmentId: number): Promise<void> {
-    console.log(`Storing program details: ${title} - ${departmentId}`);
-  }
-
-  async fetchProgramIds(): Promise<number[]> {
-    return [414924];
-  }
-
-  async getAllIds(): Promise<number[]> {
-    return [414924, 414916];
+  async update(program: Program) {
+    console.log(`Updating program ${program.id} (${program.title})`);
   }
 }
 

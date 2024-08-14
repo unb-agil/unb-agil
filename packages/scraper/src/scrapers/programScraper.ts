@@ -1,10 +1,14 @@
 import { Page } from 'puppeteer';
-import BaseScraper from '@/scrapers/baseScraper';
+
 import puppeteerSetup from '@/config/puppeteer';
+import BaseScraper from '@/scrapers/baseScraper';
 import ProgramService from '@/services/programService';
-import { GRADUATION_PROGRAMS_URL } from '@/constants';
-import { getProgramPresentationUrl } from '@/utils/urls';
-import { ProgramScraperOptions } from '@/models/programModels';
+import { GRADUATION_PROGRAMS_URL, PROGRAM_PRESENTATION_URL } from '@/constants';
+import {
+  Program,
+  ProgramData,
+  ProgramScraperOptions,
+} from '@/models/programModels';
 
 class ProgramScraper implements BaseScraper {
   private programIds: number[];
@@ -17,73 +21,83 @@ class ProgramScraper implements BaseScraper {
     this.programService = new ProgramService();
   }
 
-  async scrape() {
-    if (this.programIds.length === 0) {
-      await this.scrapeAllProgramIds();
-    }
-
-    await this.scrapeAllProgramDetails();
-  }
-
-  async scrapeAllProgramIds(): Promise<void> {
+  static async accessAllProgramsPage() {
     const page = await puppeteerSetup.newPage();
     await page.goto(GRADUATION_PROGRAMS_URL);
 
-    const programIds = await this.extractProgramIds(page);
-    await this.programService.storeProgramIds(programIds);
+    return page;
   }
 
-  async scrapeAllProgramDetails(): Promise<void> {
-    this.programIds = await this.getProgramIds();
-
-    for (const programId of this.programIds) {
-      await this.scrapeProgramDetails(programId);
-    }
-  }
-
-  async scrapeProgramDetails(programId: number): Promise<void> {
+  static async accessProgramPresentationPage(programId: Program['id']) {
     const page = await puppeteerSetup.newPage();
-    const url = getProgramPresentationUrl(programId);
+    const url = ProgramScraper.getProgramPresentationUrl(programId);
     await page.goto(url);
 
-    const title = await this.extractProgramTitle(page);
-    const departmentId = await this.extractProgramDepartmentId(page);
-
-    await this.programService.storeProgram(title, departmentId);
+    return page;
   }
 
-  private async extractProgramIds(page: Page): Promise<number[]> {
-    const selector = 'a[title="Visualizar Página do Curso"]';
-    const programIds = await page.$$eval(selector, (anchors) =>
-      anchors.map((anchors) => {
-        const href = anchors.getAttribute('href') || '';
+  static getProgramPresentationUrl(programId: Program['id']): string {
+    return `${PROGRAM_PRESENTATION_URL}&id=${programId}`;
+  }
 
-        return parseInt(href.split('=')[1], 10);
-      }),
-    );
+  static async extractProgramIds(page: Page): Promise<number[]> {
+    const selector = 'a[title="Visualizar Página do Curso"]';
+    const programIds = await page.$$eval(selector, this.evaluateProgramIds);
 
     return programIds;
   }
 
-  private async getProgramIds(): Promise<number[]> {
-    if (this.programIds.length === 0) {
-      return await this.programService.fetchProgramIds();
-    }
-
-    return this.programIds;
+  static evaluateProgramIds(anchors: Element[]): number[] {
+    return (anchors as HTMLAnchorElement[]).map((anchor) =>
+      parseInt(anchor.href.split('=')[1], 10),
+    );
   }
 
-  private async extractProgramTitle(page: Page): Promise<string> {
+  static async extractProgramData(page: Page): Promise<ProgramData> {
+    return {
+      title: await ProgramScraper.extractProgramTitle(page),
+      departmentId: await ProgramScraper.extractProgramDepartmentId(page),
+    };
+  }
+
+  static async extractProgramTitle(page: Page): Promise<string> {
     return page.$eval(
       'span.nome_curso',
       (element) => element.innerText.split(' / ')[0].split('CURSO DE ')[1],
     );
   }
 
-  private async extractProgramDepartmentId(page: Page): Promise<number> {
+  static async extractProgramDepartmentId(page: Page): Promise<number> {
     return page.$eval('span.nome_centro a', (element) =>
       parseInt(element.getAttribute('href')?.split('id=')[1] || '0', 10),
     );
+  }
+
+  async scrape() {
+    if (this.programIds.length === 0) {
+      await this.scrapeProgramIds();
+    }
+
+    await this.scrapeProgramsData();
+  }
+
+  async scrapeProgramIds(): Promise<void> {
+    const page = await ProgramScraper.accessAllProgramsPage();
+    this.programIds = await ProgramScraper.extractProgramIds(page);
+    await this.programService.storeIds(this.programIds);
+  }
+
+  async scrapeProgramsData(): Promise<void> {
+    for (const programId of this.programIds) {
+      await this.scrapeProgramData(programId);
+    }
+  }
+
+  async scrapeProgramData(programId: number): Promise<void> {
+    const page = await ProgramScraper.accessProgramPresentationPage(programId);
+    const data = await ProgramScraper.extractProgramData(page);
+    const program: Program = { id: programId, ...data };
+    await this.programService.update(program);
   }
 }
 
