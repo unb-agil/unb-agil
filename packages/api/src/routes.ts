@@ -1,4 +1,5 @@
-import DepartmentController from './controller/DepartmentController';
+import DepartmentController from '@/controller/DepartmentController';
+import ProgramController from '@/controller/ProgramController';
 
 export const Routes = [
   {
@@ -18,5 +19,17 @@ export const Routes = [
     route: '/departments',
     controller: DepartmentController,
     action: 'get',
+  },
+  {
+    method: 'post',
+    route: '/programs/sigaa-ids',
+    controller: ProgramController,
+    action: 'saveSigaaIds',
+  },
+  {
+    method: 'put',
+    route: '/programs/:sigaaId',
+    controller: ProgramController,
+    action: 'saveOrUpdate',
   },
 ];

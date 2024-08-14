@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { AppDataSource } from '@/data-source';
-import { Department } from '@/entity/Department';
+import Department from '@/entity/Department';
 
 class DepartmentController {
   private repository = AppDataSource.getRepository(Department);

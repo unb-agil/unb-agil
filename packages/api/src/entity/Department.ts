@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import Program from '@/entity/Program';
 
 @Entity()
-export class Department {
+class Department {
   @PrimaryColumn({ type: 'int' })
   sigaaId: number;
 
@@ -10,4 +11,9 @@ export class Department {
 
   @Column({ type: 'varchar', nullable: true })
   title: string;
+
+  @OneToMany(() => Program, (program) => program.department)
+  programs: Program[];
 }
+
+export default Department;

@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Department } from './Department';
+import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
+import Department from '@/entity/Department';
 
 export enum Degree {
   BACHELOR = 'BACHELOR',
@@ -7,33 +7,26 @@ export enum Degree {
 }
 
 export enum Shift {
-    DAY = 'DAY',
-    NIGHT = 'NIGHT',
-  }
+  DAY = 'DAY',
+  NIGHT = 'NIGHT',
+}
 
 @Entity()
-export class Program {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'int' })
+class Program {
+  @PrimaryColumn({ type: 'int' })
   sigaaId: number;
 
   @Column({ type: 'varchar' })
   title: string;
 
-  @Column({
-    type: 'enum',
-    enum: Degree,
-  })
+  @Column({ type: 'enum', enum: Degree })
   degree: Degree;
 
-  @Column({
-    type: 'enum',
-    enum: Shift,
-  })
+  @Column({ type: 'enum', enum: Shift })
   shift: Shift;
 
-  @ManyToOne(() => Department)
+  @ManyToOne(() => Department, (department) => department.programs)
   department: Department;
 }
+
+export default Program;
