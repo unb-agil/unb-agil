@@ -23,6 +23,13 @@ class CurriculumScraper implements BaseScraper {
     this.curriculumService = new CurriculumService();
   }
 
+  static async accessCurriculumPage(page: Page, id: Curriculum['id']) {
+    const row = `//td[contains(text(), "${id}")]/ancestor::tr`;
+    const anchor = `${row}//a[contains(@title, "Relatório")]`;
+    await page.locator(`::-p-xpath(${anchor})`).click();
+    await page.waitForNavigation();
+  }
+
   static async extractCurriculumIds(page: Page): Promise<string[]> {
     const selector = '#table_lt tr[class^="linha_"] td:nth-child(1)';
 
@@ -86,10 +93,7 @@ class CurriculumScraper implements BaseScraper {
   }
 
   async scrapeCurriculumData(page: Page, curriculumId: Curriculum['id']) {
-    const row = `//td[contains(text(), "${curriculumId}")]/ancestor::tr`;
-    const anchor = `${row}//a[contains(@title, "Relatório")]`;
-    await page.locator(`::-p-xpath(${anchor})`).click();
-    await page.waitForNavigation();
+    await CurriculumScraper.accessCurriculumPage(page, curriculumId);
 
     const data = await CurriculumScraper.extractCurriculumData(page);
     const curriculum: Curriculum = { id: curriculumId, ...data };

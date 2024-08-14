@@ -10,9 +10,14 @@ class CurriculumService {
     console.log(`Updating curriculum ${curriculum.id}`);
   }
 
-  async getProgramId(curriculumId: Curriculum['id']): Promise<number> {
+  async getProgram(curriculumId: Curriculum['id']): Promise<Program> {
     console.log(`Getting program id for curriculum ${curriculumId}`);
-    return 414924;
+
+    return {
+      id: 414924,
+      title: 'Mocked program',
+      departmentId: 1,
+    };
   }
 }
 

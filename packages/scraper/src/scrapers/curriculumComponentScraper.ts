@@ -1,16 +1,18 @@
 import { Page } from 'puppeteer';
-import puppeteerSetup from '@/config/puppeteer';
+
 import BaseScraper from '@/scrapers/baseScraper';
+import ProgramScraper from '@/scrapers/programScraper';
+import CurriculumScraper from '@/scrapers/curriculumScraper';
 import CurriculumService from '@/services/curriculumService';
 import CurriculumComponentService from '@/services/curriculumComponentService';
-import { getProgramCurriculaUrl } from '@/utils/urls';
+import { Curriculum } from '@/models/curriculumModels';
 import {
   CurriculumComponent,
   CurriculumComponentScraperOptions,
 } from '@/models/curriculumComponentModels';
 
 class CurriculumComponentScraper implements BaseScraper {
-  private curriculumIds: string[];
+  private curriculumIds: Curriculum['id'][];
   private curriculumService: CurriculumService;
   private curriculumComponentService: CurriculumComponentService;
 
@@ -22,47 +24,18 @@ class CurriculumComponentScraper implements BaseScraper {
     this.curriculumComponentService = new CurriculumComponentService();
   }
 
-  async scrape(): Promise<void> {
-    await this.scrapeAllCurriculumComponents();
-  }
-
-  async scrapeAllCurriculumComponents(): Promise<void> {
-    for (const curriculumId of this.curriculumIds) {
-      await this.scrapeComponentsFromCurriculum(curriculumId);
-    }
-  }
-
-  async scrapeComponentsFromCurriculum(curriculumId: string): Promise<void> {
-    console.log(`Scraping components from curriculum ${curriculumId}`);
-    const page = await puppeteerSetup.newPage();
-    const programId = await this.curriculumService.getProgramId(curriculumId);
-    const url = getProgramCurriculaUrl(programId);
-    await page.goto(url);
-
-    const row = `//td[contains(text(), "${curriculumId}")]/ancestor::tr`;
-    const anchor = `${row}//a[contains(@title, "Relatório")]`;
-    await page.locator(`::-p-xpath(${anchor})`).click();
-    await page.waitForNavigation();
-
+  static async extractData(page: Page, curriculumId: Curriculum['id']) {
     const electiveComponents = await this.extractElectiveComponents(page);
     const periodComponents = await this.extractPeriodComponents(page);
 
-    const formattedComponents = this.formatComponents(
+    return this.formatCurriculumComponents(
       electiveComponents,
       periodComponents,
       curriculumId,
     );
-
-    for (const component of formattedComponents) {
-      await this.curriculumComponentService.createCurriculumComponent(
-        component,
-      );
-    }
-
-    await page.close();
   }
 
-  private async extractElectiveComponents(page: Page): Promise<string[]> {
+  static async extractElectiveComponents(page: Page): Promise<string[]> {
     const table = '//td[contains(text(), "Optativas")]/ancestor::table[1]';
     const cells = table + '//tr[contains(@class, "componentes")]//td[1]';
     const xpath = `::-p-xpath(${cells})`;
@@ -76,7 +49,7 @@ class CurriculumComponentScraper implements BaseScraper {
     return ids;
   }
 
-  private async extractPeriodComponents(page: Page): Promise<string[][]> {
+  static async extractPeriodComponents(page: Page): Promise<string[][]> {
     const table = '//td[contains(text(), "Nível")]/ancestor::table[1]//tr';
     const xpath = `::-p-xpath(${table})`;
 
@@ -102,10 +75,10 @@ class CurriculumComponentScraper implements BaseScraper {
     return ids;
   }
 
-  private formatComponents(
+  static formatCurriculumComponents(
     electiveComponents: string[],
     periodComponents: string[][],
-    curriculumId: string,
+    curriculumId: Curriculum['id'],
   ): CurriculumComponent[] {
     const curriculumComponentsMap: Record<string, CurriculumComponent> = {};
 
@@ -137,6 +110,28 @@ class CurriculumComponentScraper implements BaseScraper {
     );
 
     return sorted;
+  }
+
+  async scrape(): Promise<void> {
+    for (const curriculumId of this.curriculumIds) {
+      const page = await this.accessCurriculumComponentPage(curriculumId);
+      const curriculumComponents = await this.extractData(page, curriculumId);
+      await this.curriculumComponentService.batchUpdate(curriculumComponents);
+
+      await page.close();
+    }
+  }
+
+  async accessCurriculumComponentPage(curriculumId: Curriculum['id']) {
+    const program = await this.curriculumService.getProgram(curriculumId);
+    const page = await ProgramScraper.accessProgramCurriculaPage(program.id);
+    await CurriculumScraper.accessCurriculumPage(page, curriculumId);
+
+    return page;
+  }
+
+  async extractData(page: Page, curriculumId: Curriculum['id']) {
+    return CurriculumComponentScraper.extractData(page, curriculumId);
   }
 }
 
