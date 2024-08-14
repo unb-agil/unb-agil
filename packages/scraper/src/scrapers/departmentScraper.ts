@@ -67,7 +67,7 @@ class DepartmentScraper implements BaseScraper {
   public async scrapeDepartmentIds() {
     const page = await ComponentScraper.accessComponentsPage();
     this.departmentIds = await DepartmentScraper.extractDepartmentIds(page);
-    await this.departmentService.storeIds(this.departmentIds);
+    await this.departmentService.saveIds(this.departmentIds);
 
     await page.close();
   }
@@ -77,7 +77,7 @@ class DepartmentScraper implements BaseScraper {
       const page = await DepartmentScraper.accessPresentationPage(departmentId);
       const data = await DepartmentScraper.extractDepartmentData(page);
       const department: Department = { id: departmentId, ...data };
-      await this.departmentService.update(department);
+      await this.departmentService.saveOrUpdate(department);
 
       await page.close();
     }

@@ -1,12 +1,17 @@
+import axiosInstance from '@/config/axiosConfig';
 import { Department, DepartmentParams } from '@/models/departmentModels';
 
 class DepartmentService {
-  async storeIds(departmentIds: Department['id'][]): Promise<void> {
+  async saveIds(departmentIds: Department['id'][]) {
     console.log(`Storing ${departmentIds.length} department ids`);
+
+    await axiosInstance.post('/departments/sigaa-ids', departmentIds);
   }
 
-  async update(department: Department) {
+  async saveOrUpdate(department: Department) {
     console.log(`Updating department ${department.id} (${department.title})`);
+
+    await axiosInstance.put(`/departments/${department.id}`, department);
   }
 
   async get(params: DepartmentParams): Promise<Department> {
