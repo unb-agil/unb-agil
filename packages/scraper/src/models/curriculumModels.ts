@@ -1,7 +1,7 @@
 import { Program } from './programModels';
 
 export interface CurriculumScraperOptions {
-  programIds: Program['id'][];
+  programId: Program['id'];
   curriculumIds?: Curriculum['id'][];
 }
 

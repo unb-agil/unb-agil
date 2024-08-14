@@ -11,15 +11,15 @@ import {
 } from '@/models/curriculumModels';
 
 class CurriculumScraper implements BaseScraper {
-  private programIds: Program['id'][];
+  private programId: Program['id'];
   private curriculumIds: Curriculum['id'][];
   private curriculumService: CurriculumService;
 
   constructor(options: CurriculumScraperOptions) {
-    const { programIds } = options;
+    const { programId, curriculumIds = [] } = options;
 
-    this.programIds = programIds;
-    this.curriculumIds = [];
+    this.programId = programId;
+    this.curriculumIds = curriculumIds;
     this.curriculumService = new CurriculumService();
   }
 
@@ -74,21 +74,19 @@ class CurriculumScraper implements BaseScraper {
   }
 
   async scrapeCurriculumIds(): Promise<void> {
-    for (const programId of this.programIds) {
-      const page = await ProgramScraper.accessProgramCurriculaPage(programId);
-      this.curriculumIds = await CurriculumScraper.extractCurriculumIds(page);
-      await this.curriculumService.storeIds(programId, this.curriculumIds);
-      await page.close();
-    }
+    const { programId } = this;
+    const page = await ProgramScraper.accessProgramCurriculaPage(programId);
+    this.curriculumIds = await CurriculumScraper.extractCurriculumIds(page);
+    await this.curriculumService.storeIds(programId, this.curriculumIds);
+    await page.close();
   }
 
   async scrapeCurriculaData(): Promise<void> {
-    for (const programId of this.programIds) {
-      const page = await ProgramScraper.accessProgramCurriculaPage(programId);
+    const { programId } = this;
+    const page = await ProgramScraper.accessProgramCurriculaPage(programId);
 
-      for (const curriculumId of this.curriculumIds) {
-        await this.scrapeCurriculumData(page, curriculumId);
-      }
+    for (const curriculumId of this.curriculumIds) {
+      await this.scrapeCurriculumData(page, curriculumId);
     }
   }
 

@@ -1,5 +1,5 @@
 export interface CurriculumComponentScraperOptions {
-  curriculumIds: string[];
+  programId: number;
 }
 
 export interface CurriculumComponent {

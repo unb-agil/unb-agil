@@ -10,18 +10,28 @@ import {
   CurriculumComponent,
   CurriculumComponentScraperOptions,
 } from '@/models/curriculumComponentModels';
+import { Program } from '@/models/programModels';
 
 class CurriculumComponentScraper implements BaseScraper {
-  private curriculumIds: Curriculum['id'][];
+  private programId: Program['id'];
+  private curriculumIds?: Curriculum['id'][];
   private curriculumService: CurriculumService;
   private curriculumComponentService: CurriculumComponentService;
 
   constructor(options: CurriculumComponentScraperOptions) {
-    const { curriculumIds } = options;
+    const { programId } = options;
 
-    this.curriculumIds = curriculumIds;
+    this.programId = programId;
     this.curriculumService = new CurriculumService();
     this.curriculumComponentService = new CurriculumComponentService();
+  }
+
+  static async accessComponentPage(curriculumPage: Page, componentId: string) {
+    const cell = `//td[contains(text(), "${componentId}")]`;
+    const row = cell + '/ancestor::tr[contains(@class, "componentes")]';
+    const anchor = row + '//a[contains(@title, "Detalhes")]';
+    await curriculumPage.locator(`::-p-xpath(${anchor})`).click();
+    await curriculumPage.waitForNavigation();
   }
 
   static async extractData(page: Page, curriculumId: Curriculum['id']) {
@@ -39,14 +49,7 @@ class CurriculumComponentScraper implements BaseScraper {
     const table = '//td[contains(text(), "Optativas")]/ancestor::table[1]';
     const cells = table + '//tr[contains(@class, "componentes")]//td[1]';
     const xpath = `::-p-xpath(${cells})`;
-
-    const ids = await page.$$eval(xpath, (elements) =>
-      elements.map(
-        (el) => (el as HTMLTableCellElement).innerText.split(' - ')[0],
-      ),
-    );
-
-    return ids;
+    return await page.$$eval(xpath, this.evaluateComponentIds);
   }
 
   static async extractPeriodComponents(page: Page): Promise<string[][]> {
@@ -73,6 +76,17 @@ class CurriculumComponentScraper implements BaseScraper {
     });
 
     return ids;
+  }
+
+  static async extractComponentIds(page: Page): Promise<string[]> {
+    const xpath = '::-p-xpath(//tr[contains(@class, "componentes")]//td[1])';
+    return await page.$$eval(xpath, this.evaluateComponentIds);
+  }
+
+  static evaluateComponentIds(rows: Element[]): string[] {
+    return rows.map(
+      (el) => (el as HTMLTableCellElement).innerText.split(' - ')[0],
+    );
   }
 
   static formatCurriculumComponents(
@@ -113,12 +127,19 @@ class CurriculumComponentScraper implements BaseScraper {
   }
 
   async scrape(): Promise<void> {
-    for (const curriculumId of this.curriculumIds) {
-      const page = await this.accessCurriculumComponentPage(curriculumId);
+    const page = await ProgramScraper.accessProgramCurriculaPage(
+      this.programId,
+    );
+
+    const curriculumIds = await CurriculumScraper.extractCurriculumIds(page);
+    await this.curriculumService.storeIds(this.programId, curriculumIds);
+
+    for (const curriculumId of curriculumIds) {
+      await CurriculumScraper.accessCurriculumPage(page, curriculumId);
       const curriculumComponents = await this.extractData(page, curriculumId);
       await this.curriculumComponentService.batchUpdate(curriculumComponents);
 
-      await page.close();
+      await page.goBack();
     }
   }
 

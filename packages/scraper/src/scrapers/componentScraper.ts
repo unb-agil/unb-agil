@@ -2,26 +2,30 @@ import { Page } from 'puppeteer';
 
 import puppeteerSetup from '@/config/puppeteer';
 import BaseScraper from '@/scrapers/baseScraper';
+import ProgramScraper from '@/scrapers/programScraper';
+import CurriculumScraper from '@/scrapers/curriculumScraper';
+import CurriculumComponentScraper from '@/scrapers/curriculumComponentScraper';
 import DepartmentService from '@/services/departmentService';
 import ComponentService from '@/services/componentService';
 import { parseRequisites } from '@/utils/requisites';
+import { COMPONENTS_LINK } from '@/constants';
 import {
   Component,
-  ComponentDetails,
   ComponentScraperOptions,
   ComponentType,
 } from '@/models/componentModels';
-import { COMPONENTS_LINK } from '@/constants';
 
 class ComponentScraper implements BaseScraper {
-  private componentIds: string[];
+  private programId?: number;
+  private componentId?: string;
   private departmentService: DepartmentService;
   private componentService: ComponentService;
 
   constructor(options: ComponentScraperOptions) {
-    const { componentIds } = options;
+    const { programId, componentId } = options;
 
-    this.componentIds = componentIds;
+    this.programId = programId;
+    this.componentId = componentId;
     this.departmentService = new DepartmentService();
     this.componentService = new ComponentService();
   }
@@ -33,24 +37,7 @@ class ComponentScraper implements BaseScraper {
     return page;
   }
 
-  async scrape(): Promise<void> {
-    await this.scrapeAllComponentDetails();
-  }
-
-  async scrapeAllComponentDetails(): Promise<void> {
-    for (const componentId of this.componentIds) {
-      await this.scrapeComponentDetails(componentId);
-    }
-  }
-
-  async scrapeComponentDetails(componentId: string): Promise<void> {
-    const page = await this.goToComponentPage(componentId);
-    const details = await this.extractAttributes(page);
-    const component = await this.formatComponent(componentId, details);
-    await this.componentService.storeComponent(component);
-  }
-
-  async goToComponentPage(componentId: string): Promise<Page> {
+  static async accessComponentPage(componentId: string): Promise<Page> {
     const page = await puppeteerSetup.newPage();
     await page.goto(COMPONENTS_LINK);
 
@@ -72,25 +59,31 @@ class ComponentScraper implements BaseScraper {
     return page;
   }
 
-  private async extractAttributes(page: Page): Promise<ComponentDetails> {
-    const title = await this.extractAttribute(page, 'Nome');
-    const type = await this.extractAttribute(page, 'Tipo do Componente');
-    const department = await this.extractAttribute(page, 'Responsável');
-    const prerequisites = await this.extractAttribute(page, 'Pré-Requisitos');
-    const corequisites = await this.extractAttribute(page, 'Co-Requisitos');
-    const equivalences = await this.extractAttribute(page, 'Equivalências');
+  static async extractData(componentPage: Page): Promise<Component> {
+    const id = await this.extractAttribute(componentPage, 'Código');
+    const title = await this.extractAttribute(componentPage, 'Nome');
+    const type = await this.extractAttribute(componentPage, 'Tipo');
+    const rawPre = await this.extractAttribute(componentPage, 'Pré-Requisitos');
+    const rawCo = await this.extractAttribute(componentPage, 'Co-Requisitos');
+    const rawEq = await this.extractAttribute(componentPage, 'Equivalências');
+    const dptTitle = await this.extractAttribute(componentPage, 'Responsável');
 
-    return {
+    const department = await new DepartmentService().get({ title: dptTitle });
+
+    const component = {
+      id,
       title,
-      type,
-      department,
-      prerequisites,
-      corequisites,
-      equivalences,
+      type: this.parseComponentType(type),
+      prerequisites: parseRequisites(rawPre),
+      corequisites: parseRequisites(rawCo),
+      equivalences: parseRequisites(rawEq),
+      departmentId: department.id,
     };
+
+    return component;
   }
 
-  private async extractAttribute(page: Page, detail: string): Promise<string> {
+  static async extractAttribute(page: Page, detail: string): Promise<string> {
     const xpath = `//th[contains(text(), "${detail}")]/following-sibling::td[1]`;
 
     return await page.$eval(
@@ -99,32 +92,46 @@ class ComponentScraper implements BaseScraper {
     );
   }
 
-  private async formatComponent(
-    componentId: string,
-    details: ComponentDetails,
-  ): Promise<Component> {
-    return {
-      id: componentId,
-      title: details.title,
-      type: this.getComponentType(details.type),
-      departmentId: await this.getDepartmentId(details.department),
-      prerequisites: parseRequisites(details.prerequisites),
-      corequisites: parseRequisites(details.corequisites),
-      equivalences: parseRequisites(details.equivalences),
-    };
-  }
-
-  private getComponentType(type: string) {
+  static parseComponentType(type: string) {
     return (
       Object.values(ComponentType).find((t) => t === type) ||
       ComponentType.COURSE
     );
   }
 
-  private async getDepartmentId(title: string) {
-    const department = await this.departmentService.get({ title });
+  async scrape(): Promise<void> {
+    if (this.programId) {
+      await this.scrapeProgramComponents(this.programId);
+    }
 
-    return department.id;
+    if (this.componentId) {
+      await this.scrapeSingleComponent(this.componentId);
+    }
+  }
+
+  async scrapeProgramComponents(programId: number): Promise<void> {
+    const page = await ProgramScraper.accessProgramCurriculaPage(programId);
+    const curriculumIds = await CurriculumScraper.extractCurriculumIds(page);
+
+    for (const curriculumId of curriculumIds) {
+      await CurriculumScraper.accessCurriculumPage(page, curriculumId);
+      const ids = await CurriculumComponentScraper.extractComponentIds(page);
+      await this.componentService.saveIds(ids);
+
+      for (const componentId of ids) {
+        await CurriculumComponentScraper.accessComponentPage(page, componentId);
+        const component = await ComponentScraper.extractData(page);
+        await this.componentService.save(component);
+
+        await page.goBack();
+      }
+    }
+  }
+
+  async scrapeSingleComponent(componentId: string): Promise<void> {
+    const page = await ComponentScraper.accessComponentPage(componentId);
+    const component = await ComponentScraper.extractData(page);
+    await this.componentService.save(component);
   }
 }
 

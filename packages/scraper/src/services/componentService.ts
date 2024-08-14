@@ -1,8 +1,12 @@
 import { Component } from '@/models/componentModels';
 
 class ComponentService {
-  async storeComponent(component: Component): Promise<void> {
-    console.log(`Storing component: ${component.id} - ${component.title}`);
+  async saveIds(componentIds: string[]): Promise<void> {
+    console.log(`Updating ${componentIds.length} component ids`);
+  }
+
+  async save(component: Component): Promise<void> {
+    console.log(`Updating component ${component.id} (${component.title})`);
   }
 }
 

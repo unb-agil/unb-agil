@@ -19,9 +19,14 @@ class ProgramScraper implements BaseScraper {
   private programService: ProgramService;
 
   constructor(options?: ProgramScraperOptions) {
-    const { programIds = [] } = options || {};
+    const { programId } = options || {};
 
-    this.programIds = programIds;
+    this.programIds = [];
+
+    if (programId) {
+      this.programIds.push(programId);
+    }
+
     this.programService = new ProgramService();
   }
 
@@ -114,6 +119,7 @@ class ProgramScraper implements BaseScraper {
     const data = await ProgramScraper.extractProgramData(page);
     const program: Program = { id: programId, ...data };
     await this.programService.update(program);
+    await page.close();
   }
 }
 

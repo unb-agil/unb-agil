@@ -1,5 +1,6 @@
 export interface ComponentScraperOptions {
-  componentIds: string[];
+  programId?: number;
+  componentId?: string;
 }
 
 export enum ComponentType {

@@ -1,5 +1,5 @@
 export interface ProgramScraperOptions {
-  programIds: number[];
+  programId: number;
 }
 
 export interface ProgramData {

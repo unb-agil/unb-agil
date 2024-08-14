@@ -3,7 +3,7 @@ import { Curriculum } from '@/models/curriculumModels';
 
 class CurriculumService {
   async storeIds(programId: Program['id'], curriculumIds: Curriculum['id'][]) {
-    console.log(`Storing ${curriculumIds.length} curriculum ids`);
+    console.log(`Updating ${curriculumIds.length} curriculum ids`);
   }
 
   async update(curriculum: Curriculum): Promise<void> {
