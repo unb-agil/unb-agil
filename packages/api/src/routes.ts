@@ -1,28 +1,22 @@
-import { UserController } from '@/controller/UserController';
+import DepartmentController from './controller/DepartmentController';
 
 export const Routes = [
   {
-    method: 'get',
-    route: '/users',
-    controller: UserController,
-    action: 'all',
-  },
-  {
-    method: 'get',
-    route: '/users/:id',
-    controller: UserController,
-    action: 'one',
-  },
-  {
     method: 'post',
-    route: '/users',
-    controller: UserController,
-    action: 'save',
+    route: '/departments/sigaa-ids',
+    controller: DepartmentController,
+    action: 'saveId',
   },
   {
-    method: 'delete',
-    route: '/users/:id',
-    controller: UserController,
-    action: 'remove',
+    method: 'put',
+    route: '/departments/:sigaaId',
+    controller: DepartmentController,
+    action: 'saveOrUpdate',
+  },
+  {
+    method: 'get',
+    route: '/departments',
+    controller: DepartmentController,
+    action: 'get',
   },
 ];

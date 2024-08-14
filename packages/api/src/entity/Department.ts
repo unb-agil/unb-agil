@@ -1,16 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Department {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'int' })
+  @PrimaryColumn({ type: 'int' })
   sigaaId: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   acronym: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   title: string;
 }
