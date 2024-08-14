@@ -1,74 +1,29 @@
 import { Page } from 'puppeteer';
 
-import puppeteerSetup from '@/config/puppeteer';
 import BaseScraper from '@/scrapers/baseScraper';
+import ProgramScraper from '@/scrapers/programScraper';
 import CurriculumService from '@/services/curriculumService';
-import { getProgramCurriculaUrl } from '@/utils/urls';
+import { Program } from '@/models/programModels';
 import {
-  CurriculumDetails,
+  Curriculum,
+  CurriculumData,
   CurriculumScraperOptions,
 } from '@/models/curriculumModels';
 
 class CurriculumScraper implements BaseScraper {
-  private programIds: number[];
+  private programIds: Program['id'][];
+  private curriculumIds: Curriculum['id'][];
   private curriculumService: CurriculumService;
 
   constructor(options: CurriculumScraperOptions) {
     const { programIds } = options;
 
     this.programIds = programIds;
+    this.curriculumIds = [];
     this.curriculumService = new CurriculumService();
   }
 
-  async scrape(): Promise<void> {
-    await this.scrapeAllCurriculumIds();
-    await this.scrapeAllCurriculumDetails();
-  }
-
-  async scrapeAllCurriculumIds(): Promise<void> {
-    const page = await puppeteerSetup.newPage();
-
-    for (const programId of this.programIds) {
-      const url = getProgramCurriculaUrl(programId);
-      await page.goto(url);
-
-      const curriculumIds = await this.extractCurriculumIds(page);
-
-      await this.curriculumService.storeCurriculumIds(programId, curriculumIds);
-    }
-  }
-
-  async scrapeAllCurriculumDetails(): Promise<void> {
-    for (const programId of this.programIds) {
-      const curriculumIds =
-        await this.curriculumService.getAllCurriculumIdsByProgramId(programId);
-
-      await this.scrapeCurriculumDetails(programId, curriculumIds);
-    }
-  }
-
-  async scrapeCurriculumDetails(
-    programId: number,
-    curriculumIds: string[],
-  ): Promise<void> {
-    const page = await puppeteerSetup.newPage();
-    const url = getProgramCurriculaUrl(programId);
-    await page.goto(url);
-
-    for (const curriculumId of curriculumIds) {
-      const row = `//td[contains(text(), "${curriculumId}")]/ancestor::tr`;
-      const anchor = `${row}//a[contains(@title, "Relatório")]`;
-      await page.locator(`::-p-xpath(${anchor})`).click();
-      await page.waitForNavigation();
-
-      const curriculumDetails = await this.extractCurriculumDetails(page);
-      await this.curriculumService.storeCurriculumDetails(curriculumDetails);
-
-      await page.goBack();
-    }
-  }
-
-  private async extractCurriculumIds(page: Page): Promise<string[]> {
+  static async extractCurriculumIds(page: Page): Promise<string[]> {
     const selector = '#table_lt tr[class^="linha_"] td:nth-child(1)';
 
     const rawCurriculumIds = await page.$$eval(selector, (cells) =>
@@ -83,33 +38,64 @@ class CurriculumScraper implements BaseScraper {
     return curriculumIds;
   }
 
-  async extractCurriculumDetails(page: Page): Promise<CurriculumDetails> {
-    const rawCurriculumDetails = {
-      id: await this.extractAttribute(page, 'Código'),
+  static async extractCurriculumData(page: Page): Promise<CurriculumData> {
+    const rawData = {
       startPeriod: await this.extractAttribute(page, 'Entrada em Vigor'),
       minPeriods: await this.extractAttribute(page, 'Mínimo'),
       maxPeriods: await this.extractAttribute(page, 'Máximo'),
     };
 
-    const curriculumDetails: CurriculumDetails = {
-      id: rawCurriculumDetails.id,
-      startPeriod: rawCurriculumDetails.startPeriod,
-      minPeriods: parseInt(rawCurriculumDetails.minPeriods, 10),
-      maxPeriods: parseInt(rawCurriculumDetails.maxPeriods, 10),
+    return {
+      startPeriod: rawData.startPeriod,
+      minPeriods: parseInt(rawData.minPeriods, 10),
+      maxPeriods: parseInt(rawData.maxPeriods, 10),
     };
-
-    return curriculumDetails;
   }
 
-  private async extractAttribute(
-    page: Page,
-    attribute: string,
-  ): Promise<string> {
-    const xpath = `//th[contains(text(), "${attribute}")]/following-sibling::td[1]`;
+  static async extractAttribute(page: Page, attributeTitle: string) {
+    const xpath = `//th[contains(text(), "${attributeTitle}")]/following-sibling::td[1]`;
+
     return await page.$eval(
       `::-p-xpath(${xpath})`,
       (element) => (element as HTMLTableCellElement).innerText,
     );
+  }
+
+  async scrape(): Promise<void> {
+    await this.scrapeCurriculumIds();
+    await this.scrapeCurriculaData();
+  }
+
+  async scrapeCurriculumIds(): Promise<void> {
+    for (const programId of this.programIds) {
+      const page = await ProgramScraper.accessProgramCurriculaPage(programId);
+      this.curriculumIds = await CurriculumScraper.extractCurriculumIds(page);
+      await this.curriculumService.storeIds(programId, this.curriculumIds);
+      await page.close();
+    }
+  }
+
+  async scrapeCurriculaData(): Promise<void> {
+    for (const programId of this.programIds) {
+      const page = await ProgramScraper.accessProgramCurriculaPage(programId);
+
+      for (const curriculumId of this.curriculumIds) {
+        await this.scrapeCurriculumData(page, curriculumId);
+      }
+    }
+  }
+
+  async scrapeCurriculumData(page: Page, curriculumId: Curriculum['id']) {
+    const row = `//td[contains(text(), "${curriculumId}")]/ancestor::tr`;
+    const anchor = `${row}//a[contains(@title, "Relatório")]`;
+    await page.locator(`::-p-xpath(${anchor})`).click();
+    await page.waitForNavigation();
+
+    const data = await CurriculumScraper.extractCurriculumData(page);
+    const curriculum: Curriculum = { id: curriculumId, ...data };
+    await this.curriculumService.update(curriculum);
+
+    await page.goBack();
   }
 }
 

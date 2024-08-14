@@ -1,24 +1,17 @@
-import { CurriculumDetails } from '@/models/curriculumModels';
+import { Program } from '@/models/programModels';
+import { Curriculum } from '@/models/curriculumModels';
 
 class CurriculumService {
-  async storeCurriculumIds(
-    programId: number,
-    curriculumIds: string[],
-  ): Promise<void> {
-    console.log(
-      `Storing curriculum ids for program ${programId}: ${curriculumIds.join(', ')}`,
-    );
+  async storeIds(programId: Program['id'], curriculumIds: Curriculum['id'][]) {
+    console.log(`Storing ${curriculumIds.length} curriculum ids`);
   }
 
-  async getAllCurriculumIdsByProgramId(programId: number): Promise<string[]> {
-    return ['6360/2', '6360/1', '6360/-2'];
+  async update(curriculum: Curriculum): Promise<void> {
+    console.log(`Updating curriculum ${curriculum.id}`);
   }
 
-  async storeCurriculumDetails(details: CurriculumDetails): Promise<void> {
-    console.log('Storing curriculum details:', details);
-  }
-
-  async getProgramId(curriculumId: string): Promise<number> {
+  async getProgramId(curriculumId: Curriculum['id']): Promise<number> {
+    console.log(`Getting program id for curriculum ${curriculumId}`);
     return 414924;
   }
 }

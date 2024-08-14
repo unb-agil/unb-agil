@@ -3,7 +3,11 @@ import { Page } from 'puppeteer';
 import puppeteerSetup from '@/config/puppeteer';
 import BaseScraper from '@/scrapers/baseScraper';
 import ProgramService from '@/services/programService';
-import { GRADUATION_PROGRAMS_URL, PROGRAM_PRESENTATION_URL } from '@/constants';
+import {
+  GRADUATION_PROGRAMS_URL,
+  PROGRAM_CURRICULA_URL,
+  PROGRAM_PRESENTATION_URL,
+} from '@/constants';
 import {
   Program,
   ProgramData,
@@ -21,6 +25,14 @@ class ProgramScraper implements BaseScraper {
     this.programService = new ProgramService();
   }
 
+  static getProgramPresentationUrl(programId: Program['id']): string {
+    return `${PROGRAM_PRESENTATION_URL}&id=${programId}`;
+  }
+
+  static getProgramCurriculaUrl(programId: Program['id']): string {
+    return `${PROGRAM_CURRICULA_URL}&id=${programId}`;
+  }
+
   static async accessAllProgramsPage() {
     const page = await puppeteerSetup.newPage();
     await page.goto(GRADUATION_PROGRAMS_URL);
@@ -36,8 +48,12 @@ class ProgramScraper implements BaseScraper {
     return page;
   }
 
-  static getProgramPresentationUrl(programId: Program['id']): string {
-    return `${PROGRAM_PRESENTATION_URL}&id=${programId}`;
+  static async accessProgramCurriculaPage(programId: Program['id']) {
+    const page = await puppeteerSetup.newPage();
+    const url = ProgramScraper.getProgramCurriculaUrl(programId);
+    await page.goto(url);
+
+    return page;
   }
 
   static async extractProgramIds(page: Page): Promise<number[]> {
