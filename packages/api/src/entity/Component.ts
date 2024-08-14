@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Department } from './Department';
+import { Entity, Column, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import Department from '@/entity/Department';
+import CurriculumComponent from '@/entity/CurriculumComponent';
 
 export enum ComponentType {
   COURSE = 'COURSE',
@@ -7,22 +8,24 @@ export enum ComponentType {
 }
 
 @Entity()
-export class Component {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'int' })
-  sigaaId: number;
+class Component {
+  @PrimaryColumn({ type: 'varchar' })
+  sigaaId: string;
 
   @Column({ type: 'varchar' })
   title: string;
 
-  @Column({
-    type: 'enum',
-    enum: ComponentType,
-  })
+  @Column({ type: 'enum', enum: ComponentType })
   type: ComponentType;
 
-  @ManyToOne(() => Department)
+  @OneToMany(
+    () => CurriculumComponent,
+    (curriculumComponent) => curriculumComponent.curriculum,
+  )
+  curriculumComponent: CurriculumComponent;
+
+  @ManyToOne(() => Department, (department) => department.programs)
   department: Department;
 }
+
+export default Component;

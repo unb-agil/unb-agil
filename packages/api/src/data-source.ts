@@ -3,6 +3,9 @@ import { DataSource } from 'typeorm';
 
 import Department from '@/entity/Department';
 import Program from '@/entity/Program';
+import Curriculum from '@/entity/Curriculum';
+import CurriculumComponent from '@/entity/CurriculumComponent';
+import Component from '@/entity/Component';
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
@@ -14,7 +17,7 @@ export const AppDataSource = new DataSource({
   database: process.env.MYSQL_DATABASE,
   synchronize: true,
   logging: false,
-  entities: [Department, Program],
+  entities: [Department, Program, Curriculum, CurriculumComponent, Component],
   migrations: [],
   subscribers: [],
 });

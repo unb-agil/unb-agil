@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 import Program from '@/entity/Program';
+import Component from '@/entity/Component';
 
 @Entity()
 class Department {
@@ -14,6 +15,9 @@ class Department {
 
   @OneToMany(() => Program, (program) => program.department)
   programs: Program[];
+
+  @OneToMany(() => Component, (component) => component.department)
+  components: Component[];
 }
 
 export default Department;

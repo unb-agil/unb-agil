@@ -1,5 +1,6 @@
-import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryColumn, OneToMany } from 'typeorm';
 import Department from '@/entity/Department';
+import Curriculum from '@/entity/Curriculum';
 
 export enum Degree {
   BACHELOR = 'BACHELOR',
@@ -27,6 +28,9 @@ class Program {
 
   @ManyToOne(() => Department, (department) => department.programs)
   department: Department;
+
+  @OneToMany(() => Curriculum, (curriculum) => curriculum.program)
+  curricula: Curriculum[];
 }
 
 export default Program;

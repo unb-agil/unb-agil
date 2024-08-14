@@ -1,53 +1,59 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Program } from './Program';
+import { Entity, Column, ManyToOne, PrimaryColumn, OneToMany } from 'typeorm';
+import Program from '@/entity/Program';
+import CurriculumComponent from '@/entity/CurriculumComponent';
 
 @Entity()
-export class Curriculum {
-  @PrimaryGeneratedColumn()
-  id: number;
+class Curriculum {
+  @PrimaryColumn({ type: 'varchar' })
+  sigaaId: string;
 
-  @Column({ type: 'int' })
-  sigaaId: number;
+  @Column({ type: 'boolean', nullable: true })
+  isActive: boolean;
 
-  @Column({ type: 'boolean' })
-  active: boolean;
+  @Column({ type: 'int', nullable: true })
+  startYear: number;
 
-  @Column({ type: 'int' })
-  start_year: number;
+  @Column({ type: 'int', nullable: true })
+  startPeriod: number;
 
-  @Column({ type: 'int' })
-  start_period: number;
+  @Column({ type: 'int', nullable: true })
+  minPeriods: number;
 
-  @Column({ type: 'int' })
-  min_periods: number;
+  @Column({ type: 'int', nullable: true })
+  maxPeriods: number;
 
-  @Column({ type: 'int' })
-  max_periods: number;
+  @Column({ type: 'int', nullable: true })
+  minPeriodWorkload: number;
 
-  @Column({ type: 'int' })
-  min_period_workload: number;
+  @Column({ type: 'int', nullable: true })
+  maxPeriodWorkload: number;
 
-  @Column({ type: 'int' })
-  max_period_workload: number;
+  @Column({ type: 'int', nullable: true })
+  minWorkload: number;
 
-  @Column({ type: 'int' })
-  min_workload: number;
+  @Column({ type: 'int', nullable: true })
+  mandatoryComponentsWorkload: number;
 
-  @Column({ type: 'int' })
-  mandatory_components_workload: number;
+  @Column({ type: 'int', nullable: true })
+  minElectiveComponentsWorkload: number;
 
-  @Column({ type: 'int' })
-  min_elective_components_workload: number;
+  @Column({ type: 'int', nullable: true })
+  maxElectiveComponentsWorkload: number;
 
-  @Column({ type: 'int' })
-  max_elective_components_workload: number;
+  @Column({ type: 'int', nullable: true })
+  minComplementaryComponentsWorkload: number;
 
-  @Column({ type: 'int' })
-  min_complementary_components_workload: number;
+  @Column({ type: 'int', nullable: true })
+  maxComplementaryComponentsWorkload: number;
 
-  @Column({ type: 'int' })
-  max_complementary_components_workload: number;
+  @OneToMany(
+    () => CurriculumComponent,
+    (curriculumComponent) => curriculumComponent.curriculum,
+  )
+  curriculumComponent: CurriculumComponent;
 
-  @ManyToOne(() => Program)
+  @ManyToOne(() => Program, (program) => program.curricula)
   program: Program;
 }
+
+export default Curriculum;
