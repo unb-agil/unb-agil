@@ -1,5 +1,5 @@
 export interface DepartmentScraperOptions {
-  departmentIds?: number[];
+  departmentSigaaIds?: number[];
 }
 
 export interface DepartmentData {
@@ -8,7 +8,7 @@ export interface DepartmentData {
 }
 
 export interface Department extends DepartmentData {
-  id: number;
+  sigaaId: number;
 }
 
 export interface DepartmentParams {

@@ -12,13 +12,13 @@ import {
 } from '@/models/departmentModels';
 
 class DepartmentScraper implements BaseScraper {
-  private departmentIds: number[];
+  private departmentSigaaIds: number[];
   private departmentService: DepartmentService;
 
   constructor(options?: DepartmentScraperOptions) {
-    const { departmentIds = [] } = options || {};
+    const { departmentSigaaIds = [] } = options || {};
 
-    this.departmentIds = departmentIds;
+    this.departmentSigaaIds = departmentSigaaIds;
     this.departmentService = new DepartmentService();
   }
 
@@ -34,11 +34,9 @@ class DepartmentScraper implements BaseScraper {
     return `${DEPARTMENT_PRESENTATION_BASE_URL}?id=${departmentId}`;
   }
 
-  private static async extractDepartmentIds(page: Page): Promise<number[]> {
+  private static async extractIds(departmentPage: Page) {
     const optionsSelector = "select[id='form:unidades'] option";
-    const departmentIds = await page.$$eval(optionsSelector, this.evaluateIds);
-
-    return departmentIds;
+    return await departmentPage.$$eval(optionsSelector, this.evaluateIds);
   }
 
   private static evaluateIds(options: HTMLOptionElement[]): number[] {
@@ -57,7 +55,7 @@ class DepartmentScraper implements BaseScraper {
   }
 
   public async scrape() {
-    if (this.departmentIds.length === 0) {
+    if (this.departmentSigaaIds.length === 0) {
       await this.scrapeDepartmentIds();
     }
 
@@ -66,19 +64,20 @@ class DepartmentScraper implements BaseScraper {
 
   public async scrapeDepartmentIds() {
     const page = await ComponentScraper.accessComponentsPage();
-    this.departmentIds = await DepartmentScraper.extractDepartmentIds(page);
-    await this.departmentService.saveIds(this.departmentIds);
+    this.departmentSigaaIds = await DepartmentScraper.extractIds(page);
+    await this.departmentService.saveIds(this.departmentSigaaIds);
 
     await page.close();
   }
 
   public async scrapeDepartmentsData() {
-    for (const departmentId of this.departmentIds) {
-      const page = await DepartmentScraper.accessPresentationPage(departmentId);
+    for (const sigaaId of this.departmentSigaaIds) {
+      const page = await DepartmentScraper.accessPresentationPage(sigaaId);
       const data = await DepartmentScraper.extractDepartmentData(page);
-      const department: Department = { id: departmentId, ...data };
+      const department: Department = { sigaaId, ...data };
       await this.departmentService.saveOrUpdate(department);
 
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       await page.close();
     }
   }

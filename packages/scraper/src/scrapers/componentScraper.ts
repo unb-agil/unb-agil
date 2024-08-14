@@ -77,7 +77,7 @@ class ComponentScraper implements BaseScraper {
       prerequisites: parseRequisites(rawPre),
       corequisites: parseRequisites(rawCo),
       equivalences: parseRequisites(rawEq),
-      departmentId: department.id,
+      departmentId: department.sigaaId,
     };
 
     return component;
