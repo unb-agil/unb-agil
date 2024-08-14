@@ -2,7 +2,10 @@ import { Program } from '@/models/programModels';
 import { Curriculum } from '@/models/curriculumModels';
 
 class CurriculumService {
-  async storeIds(programId: Program['id'], curriculumIds: Curriculum['id'][]) {
+  async storeIds(
+    programSigaaId: Program['sigaaId'],
+    curriculumIds: Curriculum['id'][],
+  ) {
     console.log(`Updating ${curriculumIds.length} curriculum ids`);
   }
 
@@ -14,7 +17,7 @@ class CurriculumService {
     console.log(`Getting program id for curriculum ${curriculumId}`);
 
     return {
-      id: 414924,
+      sigaaId: 414924,
       title: 'Mocked program',
       departmentId: 1,
     };

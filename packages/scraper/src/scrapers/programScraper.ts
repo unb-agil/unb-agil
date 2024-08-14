@@ -15,27 +15,27 @@ import {
 } from '@/models/programModels';
 
 class ProgramScraper implements BaseScraper {
-  private programIds: number[];
+  private programSigaaIds: number[];
   private programService: ProgramService;
 
   constructor(options?: ProgramScraperOptions) {
-    const { programId } = options || {};
+    const { programSigaaId } = options || {};
 
-    this.programIds = [];
+    this.programSigaaIds = [];
 
-    if (programId) {
-      this.programIds.push(programId);
+    if (programSigaaId) {
+      this.programSigaaIds.push(programSigaaId);
     }
 
     this.programService = new ProgramService();
   }
 
-  static getProgramPresentationUrl(programId: Program['id']): string {
-    return `${PROGRAM_PRESENTATION_URL}&id=${programId}`;
+  static getProgramPresentationUrl(programSigaaId: Program['sigaaId']): string {
+    return `${PROGRAM_PRESENTATION_URL}&id=${programSigaaId}`;
   }
 
-  static getProgramCurriculaUrl(programId: Program['id']): string {
-    return `${PROGRAM_CURRICULA_URL}&id=${programId}`;
+  static getProgramCurriculaUrl(programSigaaId: Program['sigaaId']): string {
+    return `${PROGRAM_CURRICULA_URL}&id=${programSigaaId}`;
   }
 
   static async accessAllProgramsPage() {
@@ -45,30 +45,32 @@ class ProgramScraper implements BaseScraper {
     return page;
   }
 
-  static async accessProgramPresentationPage(programId: Program['id']) {
+  static async accessProgramPresentationPage(
+    programSigaaId: Program['sigaaId'],
+  ) {
     const page = await puppeteerSetup.newPage();
-    const url = ProgramScraper.getProgramPresentationUrl(programId);
+    const url = ProgramScraper.getProgramPresentationUrl(programSigaaId);
     await page.goto(url);
 
     return page;
   }
 
-  static async accessProgramCurriculaPage(programId: Program['id']) {
+  static async accessProgramCurriculaPage(programSigaaId: Program['sigaaId']) {
     const page = await puppeteerSetup.newPage();
-    const url = ProgramScraper.getProgramCurriculaUrl(programId);
+    const url = ProgramScraper.getProgramCurriculaUrl(programSigaaId);
     await page.goto(url);
 
     return page;
   }
 
-  static async extractProgramIds(page: Page): Promise<number[]> {
+  static async extractProgramSigaaIds(page: Page): Promise<number[]> {
     const selector = 'a[title="Visualizar Página do Curso"]';
-    const programIds = await page.$$eval(selector, this.evaluateProgramIds);
+    const programSigaaIds = await page.$$eval(selector, this.evaluateSigaaIds);
 
-    return programIds;
+    return programSigaaIds;
   }
 
-  static evaluateProgramIds(anchors: Element[]): number[] {
+  static evaluateSigaaIds(anchors: Element[]): number[] {
     return (anchors as HTMLAnchorElement[]).map((anchor) =>
       parseInt(anchor.href.split('=')[1], 10),
     );
@@ -95,30 +97,31 @@ class ProgramScraper implements BaseScraper {
   }
 
   async scrape() {
-    if (this.programIds.length === 0) {
-      await this.scrapeProgramIds();
+    if (this.programSigaaIds.length === 0) {
+      await this.scrapeProgramSigaaIds();
     }
 
     await this.scrapeProgramsData();
   }
 
-  async scrapeProgramIds(): Promise<void> {
+  async scrapeProgramSigaaIds(): Promise<void> {
     const page = await ProgramScraper.accessAllProgramsPage();
-    this.programIds = await ProgramScraper.extractProgramIds(page);
-    await this.programService.storeIds(this.programIds);
+    this.programSigaaIds = await ProgramScraper.extractProgramSigaaIds(page);
+    await this.programService.saveSigaaIds(this.programSigaaIds);
   }
 
   async scrapeProgramsData(): Promise<void> {
-    for (const programId of this.programIds) {
-      await this.scrapeProgramData(programId);
+    for (const programSigaaId of this.programSigaaIds) {
+      await this.scrapeProgramData(programSigaaId);
     }
   }
 
-  async scrapeProgramData(programId: number): Promise<void> {
-    const page = await ProgramScraper.accessProgramPresentationPage(programId);
+  async scrapeProgramData(programSigaaId: number): Promise<void> {
+    const page =
+      await ProgramScraper.accessProgramPresentationPage(programSigaaId);
     const data = await ProgramScraper.extractProgramData(page);
-    const program: Program = { id: programId, ...data };
-    await this.programService.update(program);
+    const program: Program = { sigaaId: programSigaaId, ...data };
+    await this.programService.saveOrUpdate(program);
     await page.close();
   }
 }

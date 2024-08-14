@@ -1,12 +1,17 @@
+import axiosInstance from '@/config/axiosConfig';
 import { Program } from '@/models/programModels';
 
 class ProgramService {
-  async storeIds(programIds: Program['id'][]): Promise<void> {
-    console.log(`Storing ${programIds.length} program ids`);
+  async saveSigaaIds(programSigaaIds: Program['sigaaId'][]): Promise<void> {
+    console.log(`Storing ${programSigaaIds.length} program ids`);
+
+    await axiosInstance.post('/programs/sigaa-ids', programSigaaIds);
   }
 
-  async update(program: Program) {
-    console.log(`Updating program ${program.id} (${program.title})`);
+  async saveOrUpdate(program: Program) {
+    console.log(`Updating program ${program.sigaaId} (${program.title})`);
+
+    await axiosInstance.put(`/programs/${program.sigaaId}`, program);
   }
 }
 

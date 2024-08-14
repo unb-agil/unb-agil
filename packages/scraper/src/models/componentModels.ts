@@ -1,5 +1,5 @@
 export interface ComponentScraperOptions {
-  programId?: number;
+  programSigaaId?: number;
   componentId?: string;
 }
 

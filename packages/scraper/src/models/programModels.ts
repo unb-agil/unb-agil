@@ -1,5 +1,5 @@
 export interface ProgramScraperOptions {
-  programId: number;
+  programSigaaId: number;
 }
 
 export interface ProgramData {
@@ -8,5 +8,5 @@ export interface ProgramData {
 }
 
 export interface Program extends ProgramData {
-  id: number;
+  sigaaId: number;
 }

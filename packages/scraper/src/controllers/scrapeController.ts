@@ -7,14 +7,16 @@ import CurriculumComponentScraper from '@/scrapers/curriculumComponentScraper';
 import ComponentScraper from '@/scrapers/componentScraper';
 
 class ScrapeController {
-  async scrapeByProgram(programIds: number[]) {
-    const scrapers: BaseScraper[] = [new DepartmentScraper()];
+  async scrapeByProgram(programSigaaIds: number[]) {
+    const scrapers: BaseScraper[] = [
+      new DepartmentScraper(), //
+    ];
 
-    programIds.forEach((programId) => {
-      scrapers.push(new ProgramScraper({ programId }));
-      scrapers.push(new CurriculumScraper({ programId }));
-      scrapers.push(new CurriculumComponentScraper({ programId }));
-      scrapers.push(new ComponentScraper({ programId }));
+    programSigaaIds.forEach((programSigaaId) => {
+      scrapers.push(new ProgramScraper({ programSigaaId }));
+      scrapers.push(new CurriculumScraper({ programSigaaId }));
+      scrapers.push(new CurriculumComponentScraper({ programSigaaId }));
+      scrapers.push(new ComponentScraper({ programSigaaId }));
     });
 
     for (const scraper of scrapers) {

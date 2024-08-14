@@ -16,15 +16,15 @@ import {
 } from '@/models/componentModels';
 
 class ComponentScraper implements BaseScraper {
-  private programId?: number;
+  private programSigaaId?: number;
   private componentId?: string;
   private departmentService: DepartmentService;
   private componentService: ComponentService;
 
   constructor(options: ComponentScraperOptions) {
-    const { programId, componentId } = options;
+    const { programSigaaId, componentId } = options;
 
-    this.programId = programId;
+    this.programSigaaId = programSigaaId;
     this.componentId = componentId;
     this.departmentService = new DepartmentService();
     this.componentService = new ComponentService();
@@ -100,8 +100,8 @@ class ComponentScraper implements BaseScraper {
   }
 
   async scrape(): Promise<void> {
-    if (this.programId) {
-      await this.scrapeProgramComponents(this.programId);
+    if (this.programSigaaId) {
+      await this.scrapeProgramComponents(this.programSigaaId);
     }
 
     if (this.componentId) {
@@ -109,8 +109,9 @@ class ComponentScraper implements BaseScraper {
     }
   }
 
-  async scrapeProgramComponents(programId: number): Promise<void> {
-    const page = await ProgramScraper.accessProgramCurriculaPage(programId);
+  async scrapeProgramComponents(programSigaaId: number): Promise<void> {
+    const page =
+      await ProgramScraper.accessProgramCurriculaPage(programSigaaId);
     const curriculumIds = await CurriculumScraper.extractCurriculumIds(page);
 
     for (const curriculumId of curriculumIds) {
