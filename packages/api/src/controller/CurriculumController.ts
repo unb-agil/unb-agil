@@ -46,6 +46,12 @@ class CurriculumController {
 
     return this.repository.save(curriculum);
   }
+
+  async getProgram(request: Request) {
+    const sigaaId = decodeURIComponent(request.params.sigaaId);
+    const curriculum = await this.repository.findOneBy({ sigaaId });
+    return curriculum.program;
+  }
 }
 
 export default CurriculumController;
