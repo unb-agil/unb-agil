@@ -79,7 +79,7 @@ class ProgramScraper implements BaseScraper {
   static async extractProgramData(page: Page): Promise<ProgramData> {
     return {
       title: await ProgramScraper.extractProgramTitle(page),
-      departmentId: await ProgramScraper.extractProgramDepartmentId(page),
+      departmentSigaaId: await ProgramScraper.extractProgramDepartmentId(page),
     };
   }
 
@@ -92,7 +92,7 @@ class ProgramScraper implements BaseScraper {
 
   static async extractProgramDepartmentId(page: Page): Promise<number> {
     return page.$eval('span.nome_centro a', (element) =>
-      parseInt(element.getAttribute('href')?.split('id=')[1] || '0', 10),
+      parseInt((element as HTMLAnchorElement).href.split('id=')[1], 10),
     );
   }
 
@@ -121,6 +121,7 @@ class ProgramScraper implements BaseScraper {
       await ProgramScraper.accessProgramPresentationPage(programSigaaId);
     const data = await ProgramScraper.extractProgramData(page);
     const program: Program = { sigaaId: programSigaaId, ...data };
+    console.log(program);
     await this.programService.saveOrUpdate(program);
     await page.close();
   }

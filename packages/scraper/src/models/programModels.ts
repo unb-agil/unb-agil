@@ -4,7 +4,7 @@ export interface ProgramScraperOptions {
 
 export interface ProgramData {
   title: string;
-  departmentId: number;
+  departmentSigaaId: number;
 }
 
 export interface Program extends ProgramData {
