@@ -45,7 +45,10 @@ class CurriculumScraper implements BaseScraper {
     return curriculumSigaaIds;
   }
 
-  static async extractCurriculumData(page: Page): Promise<CurriculumData> {
+  static async extractCurriculumData(
+    page: Page,
+    programSigaaId: Program['sigaaId'],
+  ): Promise<CurriculumData> {
     const rawData = {
       startPeriod: await this.extractAttribute(page, 'Entrada em Vigor'),
       minPeriods: await this.extractAttribute(page, 'Mínimo'),
@@ -56,6 +59,7 @@ class CurriculumScraper implements BaseScraper {
       startPeriod: rawData.startPeriod,
       minPeriods: parseInt(rawData.minPeriods, 10),
       maxPeriods: parseInt(rawData.maxPeriods, 10),
+      programSigaaId,
     };
   }
 
@@ -74,15 +78,15 @@ class CurriculumScraper implements BaseScraper {
   }
 
   async scrapeCurriculumSigaaIds(): Promise<void> {
-    const { programSigaaId } = this;
-    const page =
-      await ProgramScraper.accessProgramCurriculaPage(programSigaaId);
+    const page = await ProgramScraper.accessProgramCurriculaPage(
+      this.programSigaaId,
+    );
+
     this.curriculumSigaaIds =
       await CurriculumScraper.extractCurriculumSigaaIds(page);
-    await this.curriculumService.storeIds(
-      programSigaaId,
-      this.curriculumSigaaIds,
-    );
+
+    await this.curriculumService.saveSigaaIds(this.curriculumSigaaIds);
+
     await page.close();
   }
 
@@ -102,9 +106,13 @@ class CurriculumScraper implements BaseScraper {
   ) {
     await CurriculumScraper.accessCurriculumPage(page, curriculumSigaaId);
 
-    const data = await CurriculumScraper.extractCurriculumData(page);
+    const data = await CurriculumScraper.extractCurriculumData(
+      page,
+      this.programSigaaId,
+    );
+
     const curriculum: Curriculum = { sigaaId: curriculumSigaaId, ...data };
-    await this.curriculumService.update(curriculum);
+    await this.curriculumService.saveOrUpdate(curriculum);
 
     await page.goBack();
   }

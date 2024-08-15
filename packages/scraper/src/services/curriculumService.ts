@@ -1,16 +1,19 @@
 import { Program } from '@/models/programModels';
 import { Curriculum } from '@/models/curriculumModels';
+import axiosInstance from '@/config/axiosConfig';
 
 class CurriculumService {
-  async storeIds(
-    programSigaaId: Program['sigaaId'],
-    curriculumSigaaIds: Curriculum['sigaaId'][],
-  ) {
+  async saveSigaaIds(curriculumSigaaIds: Curriculum['sigaaId'][]) {
     console.log(`Updating ${curriculumSigaaIds.length} curriculum ids`);
+
+    await axiosInstance.post('/curricula/sigaa-ids', curriculumSigaaIds);
   }
 
-  async update(curriculum: Curriculum): Promise<void> {
+  async saveOrUpdate(curriculum: Curriculum): Promise<void> {
     console.log(`Updating curriculum ${curriculum.sigaaId}`);
+    const sigaaId = encodeURIComponent(curriculum.sigaaId);
+
+    await axiosInstance.put(`/curricula/${sigaaId}`, curriculum);
   }
 
   async getProgram(curriculumSigaaId: Curriculum['sigaaId']): Promise<Program> {

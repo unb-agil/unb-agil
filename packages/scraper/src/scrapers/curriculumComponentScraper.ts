@@ -136,10 +136,7 @@ class CurriculumComponentScraper implements BaseScraper {
 
     const curriculumSigaaIds =
       await CurriculumScraper.extractCurriculumSigaaIds(page);
-    await this.curriculumService.storeIds(
-      this.programSigaaId,
-      curriculumSigaaIds,
-    );
+    await this.curriculumService.saveSigaaIds(curriculumSigaaIds);
 
     for (const curriculumSigaaId of curriculumSigaaIds) {
       await CurriculumScraper.accessCurriculumPage(page, curriculumSigaaId);
