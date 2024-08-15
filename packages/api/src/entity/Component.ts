@@ -37,6 +37,9 @@ class Component {
 
   @ManyToOne(() => Department, (department) => department.programs)
   department: Department;
+
+  @Column({ type: 'int', nullable: true })
+  departmentSigaaId: number;
 }
 
 export default Component;
