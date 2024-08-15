@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
 import puppeteerSetup from '@/config/puppeteer';
@@ -107,6 +108,8 @@ class ProgramScraper implements BaseScraper {
   }
 
   async scrape() {
+    console.log(chalk.bold.black.bgYellowBright('\nCursos'));
+
     if (this.programSigaaIds.length === 0) {
       await this.scrapeProgramSigaaIds();
     }
@@ -131,7 +134,6 @@ class ProgramScraper implements BaseScraper {
       await ProgramScraper.accessProgramPresentationPage(programSigaaId);
     const data = await ProgramScraper.extractProgramData(page);
     const program: Program = { sigaaId: programSigaaId, ...data };
-    console.log(program);
     await this.programService.saveOrUpdate(program);
     await page.close();
   }

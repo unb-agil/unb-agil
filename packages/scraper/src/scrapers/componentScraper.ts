@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
 import puppeteerSetup from '@/config/puppeteer';
@@ -112,6 +113,8 @@ class ComponentScraper implements BaseScraper {
   }
 
   async scrape(): Promise<void> {
+    console.log(chalk.bold.black.bgCyanBright('\nComponentes'));
+
     if (this.programSigaaId) {
       await this.scrapeProgramComponents(this.programSigaaId);
     }

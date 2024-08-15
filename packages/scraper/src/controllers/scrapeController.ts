@@ -32,7 +32,6 @@ class ScrapeController {
     });
 
     for (const scraper of scrapers) {
-      console.log(`\n[${scraper.constructor.name}]`);
       await scraper.scrape();
     }
 

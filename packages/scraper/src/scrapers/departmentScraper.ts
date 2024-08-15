@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
 import puppeteerSetup from '@/config/puppeteer';
@@ -55,6 +56,8 @@ class DepartmentScraper implements BaseScraper {
   }
 
   public async scrape() {
+    console.log(chalk.bold.black.bgGreenBright('\nDepartamentos'));
+
     if (this.departmentSigaaIds.length === 0) {
       await this.scrapeDepartmentIds();
     }

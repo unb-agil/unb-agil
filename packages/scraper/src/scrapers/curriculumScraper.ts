@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
 import BaseScraper from '@/scrapers/baseScraper';
@@ -73,6 +74,7 @@ class CurriculumScraper implements BaseScraper {
   }
 
   async scrape(): Promise<void> {
+    console.log(chalk.bold.black.bgBlueBright('\nCurrículos'));
     await this.scrapeCurriculumSigaaIds();
     await this.scrapeCurriculaData();
   }

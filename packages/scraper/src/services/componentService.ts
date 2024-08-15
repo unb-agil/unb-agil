@@ -1,15 +1,18 @@
+import chalk from 'chalk';
 import axiosInstance from '@/config/axiosConfig';
 import { Component } from '@/models/componentModels';
 
+const log = (message: string) => console.log(chalk.cyanBright(message));
+const bold = (message: string | number) => chalk.bold(message);
+
 class ComponentService {
   async saveSigaaIds(componentSigaaIds: string[]): Promise<void> {
-    console.log(`Updating ${componentSigaaIds.length} component ids`);
-
+    log(`Salvando ${bold(componentSigaaIds.length)} IDs de componentes.`);
     await axiosInstance.post('/components/sigaa-ids', componentSigaaIds);
   }
 
   async saveOrUpdate(component: Component): Promise<void> {
-    console.log(`Updating component ${component.sigaaId} (${component.title})`);
+    log(`Atualizando componente ${bold(component.sigaaId)}`);
 
     const prerequisites =
       typeof component.prerequisites === 'string' || !component.prerequisites

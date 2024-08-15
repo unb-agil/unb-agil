@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
 import BaseScraper from '@/scrapers/baseScraper';
@@ -138,6 +139,10 @@ class CurriculumComponentScraper implements BaseScraper {
   }
 
   async scrape(): Promise<void> {
+    console.log(
+      chalk.bold.black.bgMagentaBright('\n Componentes Curriculares'),
+    );
+
     const page = await ProgramScraper.accessProgramCurriculaPage(
       this.programSigaaId,
     );
@@ -169,7 +174,6 @@ class CurriculumComponentScraper implements BaseScraper {
     const { sigaaId } =
       await this.curriculumService.getProgram(curriculumSigaaId);
 
-    console.log(sigaaId);
     const page = await ProgramScraper.accessProgramCurriculaPage(sigaaId);
     await CurriculumScraper.accessCurriculumPage(page, curriculumSigaaId);
 

@@ -1,26 +1,23 @@
+import chalk from 'chalk';
 import axiosInstance from '@/config/axiosConfig';
 import { Department, DepartmentParams } from '@/models/departmentModels';
 
+const log = (message: string) => console.log(chalk.greenBright(message));
+const bold = (message: string | number) => chalk.bold(message);
+
 class DepartmentService {
   async saveIds(departmentIds: Department['sigaaId'][]) {
-    console.log(`Storing ${departmentIds.length} department ids`);
-
+    log(`Salvando ${bold(departmentIds.length)} IDs de departamentos.`);
     await axiosInstance.post('/departments/sigaa-ids', departmentIds);
   }
 
   async saveOrUpdate(department: Department) {
-    console.log(
-      `Updating department ${department.sigaaId} (${department.title})`,
-    );
-
+    log(`Atualizando departamento ${bold(department.title)}`);
     await axiosInstance.put(`/departments/${department.sigaaId}`, department);
   }
 
   async get(params: DepartmentParams): Promise<Department> {
-    console.log(`Getting department with params: ${JSON.stringify(params)}`);
-
     const res = await axiosInstance.get<Department>('/departments', { params });
-
     return res.data;
   }
 }
