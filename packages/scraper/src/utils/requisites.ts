@@ -2,8 +2,8 @@ import { RequisitesExpression } from '@/models/componentModels';
 
 function replaceOperators(expression: string): string {
   return expression
-    .replace(/E/g, 'and')
-    .replace(/OU/g, 'or')
+    .replace(/ E /g, 'and')
+    .replace(/ OU /g, 'or')
     .replace(/\s/g, '');
 }
 
