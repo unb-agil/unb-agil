@@ -24,6 +24,17 @@ class DepartmentController {
 
     return this.repository.save(department);
   }
+
+  async get(request: Request) {
+    const { sigaaId, title, acronym } = request.query;
+
+    const departmentParams = {};
+    if (sigaaId) departmentParams['sigaaId'] = Number(sigaaId);
+    if (title) departmentParams['title'] = title;
+    if (acronym) departmentParams['acronym'] = acronym;
+
+    return this.repository.findOneBy(departmentParams);
+  }
 }
 
 export default DepartmentController;

@@ -12,7 +12,7 @@ export interface Department extends DepartmentData {
 }
 
 export interface DepartmentParams {
-  id?: number;
+  sigaaId?: number;
   acronym?: string;
   title?: string;
 }

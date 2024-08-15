@@ -19,11 +19,9 @@ class DepartmentService {
   async get(params: DepartmentParams): Promise<Department> {
     console.log(`Getting department with params: ${JSON.stringify(params)}`);
 
-    return {
-      sigaaId: 673,
-      acronym: 'FGA',
-      title: 'Faculdade do Gama',
-    };
+    const res = await axiosInstance.get<Department>('/departments', { params });
+
+    return res.data;
   }
 }
 
