@@ -5,9 +5,21 @@ import ProgramScraper from '@/scrapers/programScraper';
 import CurriculumScraper from '@/scrapers/curriculumScraper';
 import CurriculumComponentScraper from '@/scrapers/curriculumComponentScraper';
 import ComponentScraper from '@/scrapers/componentScraper';
+import { COMPONENTS_LINK } from '@/constants';
 
 class ScrapeController {
+  static async closeCookiesDialog() {
+    const page = await puppeteerSetup.newPage();
+    await page.goto(COMPONENTS_LINK);
+    const button = await page.$('dialog#sigaa-cookie-consent button');
+    await button?.click();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await page.close();
+  }
+
   async scrapeByProgram(programSigaaIds: number[]) {
+    await ScrapeController.closeCookiesDialog();
+
     const scrapers: BaseScraper[] = [
       new DepartmentScraper(), //
     ];

@@ -139,7 +139,7 @@ class ComponentScraper implements BaseScraper {
         );
         const component = await ComponentScraper.extractData(page);
         await this.componentService.saveOrUpdate(component);
-
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         await page.goBack();
       }
     }
