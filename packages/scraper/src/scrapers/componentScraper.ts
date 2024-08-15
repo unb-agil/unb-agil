@@ -66,9 +66,13 @@ class ComponentScraper implements BaseScraper {
     const rawPre = await this.extractAttribute(componentPage, 'Pré-Requisitos');
     const rawCo = await this.extractAttribute(componentPage, 'Co-Requisitos');
     const rawEq = await this.extractAttribute(componentPage, 'Equivalências');
-    const dptTitle = await this.extractAttribute(componentPage, 'Responsável');
+    const departmentTitle = (
+      await this.extractAttribute(componentPage, 'Responsável')
+    ).split(' - ')[0];
 
-    const department = await new DepartmentService().get({ title: dptTitle });
+    const department = await new DepartmentService().get({
+      title: departmentTitle,
+    });
 
     const component = {
       sigaaId,
@@ -77,7 +81,7 @@ class ComponentScraper implements BaseScraper {
       prerequisites: parseRequisites(rawPre),
       corequisites: parseRequisites(rawCo),
       equivalences: parseRequisites(rawEq),
-      departmentId: department.sigaaId,
+      departmentSigaaId: department.sigaaId,
     };
 
     return component;

@@ -23,7 +23,7 @@ export interface Component {
   sigaaId: string;
   title: string;
   type: ComponentType;
-  departmentId: number;
+  departmentSigaaId: number;
   prerequisites: RequisitesExpression;
   corequisites: RequisitesExpression;
   equivalences: RequisitesExpression;
