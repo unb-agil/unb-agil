@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  Unique,
+} from 'typeorm';
 import Curriculum from '@/entity/Curriculum';
 import Component from '@/entity/Component';
 
@@ -8,6 +14,7 @@ export enum CurriculumComponentType {
 }
 
 @Entity()
+@Unique(['curriculum', 'component'])
 class CurriculumComponent {
   @PrimaryGeneratedColumn()
   id: number;
@@ -15,7 +22,7 @@ class CurriculumComponent {
   @Column({ type: 'enum', enum: CurriculumComponentType })
   type: CurriculumComponentType;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   percentagePrequisite: number;
 
   @ManyToOne(() => Curriculum, (curriculum) => curriculum.curriculumComponent)

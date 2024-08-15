@@ -5,6 +5,8 @@ import CurriculumComponent from '@/entity/CurriculumComponent';
 export enum ComponentType {
   COURSE = 'COURSE',
   ACTIVITY = 'ACTIVITY',
+  BLOCK = 'BLOCK',
+  MODULE = 'MODULE',
 }
 
 @Entity()
@@ -12,11 +14,20 @@ class Component {
   @PrimaryColumn({ type: 'varchar' })
   sigaaId: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   title: string;
 
-  @Column({ type: 'enum', enum: ComponentType })
+  @Column({ type: 'enum', enum: ComponentType, nullable: true })
   type: ComponentType;
+
+  @Column({ type: 'varchar', nullable: true })
+  prerequisites: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  corequisites: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  equivalences: string;
 
   @OneToMany(
     () => CurriculumComponent,
