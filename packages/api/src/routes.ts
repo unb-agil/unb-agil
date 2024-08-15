@@ -1,5 +1,6 @@
 import DepartmentController from '@/controller/DepartmentController';
 import ProgramController from '@/controller/ProgramController';
+import CurriculumController from '@/controller/CurriculumController';
 
 export const Routes = [
   {
@@ -30,6 +31,18 @@ export const Routes = [
     method: 'put',
     route: '/programs/:sigaaId',
     controller: ProgramController,
+    action: 'saveOrUpdate',
+  },
+  {
+    method: 'post',
+    route: '/curricula/sigaa-ids',
+    controller: CurriculumController,
+    action: 'saveSigaaIds',
+  },
+  {
+    method: 'put',
+    route: '/curricula/:sigaaId',
+    controller: CurriculumController,
     action: 'saveOrUpdate',
   },
 ];
