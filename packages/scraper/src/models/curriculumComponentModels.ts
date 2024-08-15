@@ -4,7 +4,7 @@ export interface CurriculumComponentScraperOptions {
 
 export interface CurriculumComponent {
   curriculumSigaaId: string;
-  componentId: string;
-  isMandatory: boolean;
+  componentSigaaId: string;
+  type: 'MANDATORY' | 'ELECTIVE';
   recommendedPeriod?: number;
 }

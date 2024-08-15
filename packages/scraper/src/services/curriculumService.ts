@@ -16,14 +16,15 @@ class CurriculumService {
     await axiosInstance.put(`/curricula/${sigaaId}`, curriculum);
   }
 
-  async getProgram(curriculumSigaaId: Curriculum['sigaaId']): Promise<Program> {
+  async getProgram(curriculumSigaaId: Curriculum['sigaaId']) {
     console.log(`Getting program id for curriculum ${curriculumSigaaId}`);
 
-    return {
-      sigaaId: 414924,
-      title: 'Mocked program',
-      departmentId: 1,
-    };
+    const encodedSigaaId = encodeURIComponent(curriculumSigaaId);
+    const { data } = await axiosInstance.get<Program>(
+      `/curricula/${encodedSigaaId}/program`,
+    );
+
+    return data;
   }
 }
 

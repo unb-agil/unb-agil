@@ -1,13 +1,13 @@
 export interface ComponentScraperOptions {
   programSigaaId?: number;
-  componentId?: string;
+  componentSigaaId?: string;
 }
 
 export enum ComponentType {
-  COURSE = 'DISCIPLINA',
-  ACTIVITY = 'ATIVIDADE',
-  BLOCK = 'BLOCO',
-  MODULE = 'MÓDULO',
+  COURSE = 'COURSE',
+  ACTIVITY = 'ACTIVITY',
+  BLOCK = 'BLOCK',
+  MODULE = 'MODULE',
 }
 
 export interface ComponentDetails {
@@ -20,7 +20,7 @@ export interface ComponentDetails {
 }
 
 export interface Component {
-  id: string;
+  sigaaId: string;
   title: string;
   type: ComponentType;
   departmentId: number;
