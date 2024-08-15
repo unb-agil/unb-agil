@@ -121,6 +121,10 @@ function parseGroup(expression: string): RequisitesExpression {
 }
 
 export function parseRequisites(expression: string): RequisitesExpression {
+  if (!expression || expression.trim() === '-') {
+    return null;
+  }
+
   const replacedExpression = replaceOperators(expression);
   const cleanedExpression = removeSingleParentheses(replacedExpression);
   const parsedExpression = parseGroup(cleanedExpression);
