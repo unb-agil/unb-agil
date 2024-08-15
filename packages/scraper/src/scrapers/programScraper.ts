@@ -3,6 +3,7 @@ import { Page } from 'puppeteer';
 import puppeteerSetup from '@/config/puppeteer';
 import BaseScraper from '@/scrapers/baseScraper';
 import ProgramService from '@/services/programService';
+import DepartmentService from '@/services/departmentService';
 import {
   GRADUATION_PROGRAMS_URL,
   PROGRAM_CURRICULA_URL,
@@ -77,23 +78,32 @@ class ProgramScraper implements BaseScraper {
   }
 
   static async extractProgramData(page: Page): Promise<ProgramData> {
+    const title = await this.extractProgramTitle(page);
+
+    const departmentTitle = await this.extractDepartmentTitle(page);
+    const departmentService = new DepartmentService();
+    const { sigaaId } = await departmentService.get({ title: departmentTitle });
+
     return {
-      title: await ProgramScraper.extractProgramTitle(page),
-      departmentSigaaId: await ProgramScraper.extractProgramDepartmentId(page),
+      title,
+      departmentSigaaId: sigaaId,
     };
   }
 
   static async extractProgramTitle(page: Page): Promise<string> {
-    return page.$eval(
-      'span.nome_curso',
-      (element) => element.innerText.split(' / ')[0].split('CURSO DE ')[1],
-    );
+    const selector = 'span.nome_curso';
+    const raw = await page.$eval(selector, (el) => el.innerText);
+    const title = raw.split(' / ')[0].split('CURSO DE ')[1];
+
+    return title;
   }
 
-  static async extractProgramDepartmentId(page: Page): Promise<number> {
-    return page.$eval('span.nome_centro a', (element) =>
-      parseInt((element as HTMLAnchorElement).href.split('id=')[1], 10),
-    );
+  static async extractDepartmentTitle(page: Page) {
+    const selector = 'span.nome_centro a';
+    const innerText = await page.$eval(selector, (el) => el.innerText);
+    const title = innerText.split(' - ')[0];
+
+    return title;
   }
 
   async scrape() {
