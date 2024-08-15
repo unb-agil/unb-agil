@@ -13,7 +13,7 @@ class ScrapeController {
     await page.goto(COMPONENTS_LINK);
     const button = await page.$('dialog#sigaa-cookie-consent button');
     await button?.click();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await page.close();
   }
 

@@ -77,7 +77,7 @@ class DepartmentScraper implements BaseScraper {
       const department: Department = { sigaaId, ...data };
       await this.departmentService.saveOrUpdate(department);
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       await page.close();
     }
   }
