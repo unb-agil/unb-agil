@@ -1,0 +1,10 @@
+{
+  "name": "@unb-agil/academic-history",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@unb-agil/eslint-config": "*",
+    "@unb-agil/typescript-config": "*"
+  }
+}
