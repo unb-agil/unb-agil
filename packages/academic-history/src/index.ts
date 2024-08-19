@@ -16,6 +16,7 @@ interface AcademicHistory {
   requiredWorkload?: Workload;
   completedWorkload?: Workload;
   remainingWorkload?: Workload;
+  remainingCourseSigaaIds?: string[];
 }
 
 const RELATIVE_PATH = './historico_170105342.pdf';
@@ -86,17 +87,41 @@ function handleRemainingWorkloadRow(row: string[]): void {
   }
 }
 
+function handleRemainingCourses(rows: string[][], index: number): void {
+  const isRemainingCoursesHeaderRow =
+    rows[index].at(0) === 'Código' &&
+    rows[index].at(1) === 'Componente Curricular' &&
+    rows[index].at(2) === 'CH';
+
+  if (!isRemainingCoursesHeaderRow) {
+    return;
+  }
+
+  const remainingCourses = rows.slice(index + 1).filter((row) => {
+    if (row.length === 3 || row.length === 4) {
+      return row.at(-1)?.match(/\d+ h$/);
+    }
+  });
+
+  const remainingCourseSigaaIds = remainingCourses.map((row) => row[0]);
+
+  academicHistory.remainingCourseSigaaIds = Array.from(
+    new Set(remainingCourseSigaaIds),
+  );
+}
+
 function callback(error: unknown, rows: string[][]) {
   if (error) {
     return console.log(error);
   }
 
-  rows.forEach((row) => {
+  rows.forEach((row, index) => {
     handleProgramRow(row);
     handleCurriculumRow(row);
     handleRequiredWorkloadRow(row);
     handleCompletedWorkloadRow(row);
     handleRemainingWorkloadRow(row);
+    handleRemainingCourses(rows, index);
   });
 
   console.log(academicHistory);
