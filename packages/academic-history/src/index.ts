@@ -2,27 +2,88 @@ import path from 'path';
 import fs from 'fs';
 import pdf2table from 'pdf2table';
 
+interface Workload {
+  mandatory: number;
+  elective: number;
+  complementary: number;
+  total: number;
+}
+
+interface AcademicHistory {
+  programTitle?: string;
+  departmentAcronym?: string;
+  curriculumId?: string;
+  requiredWorkload?: Workload;
+  completedWorkload?: Workload;
+  remainingWorkload?: Workload;
+}
+
 const RELATIVE_PATH = './historico_170105342.pdf';
 
 const absolutePath = path.resolve(__dirname, RELATIVE_PATH);
 const file = fs.readFileSync(absolutePath);
 
-function getProgram(rows: string[][]) {
-  const [programTitle, departmentAcronym] = rows[10][1]
-    .split(' - ')[0]
-    .split('/');
+const academicHistory: AcademicHistory = {};
 
-  return {
-    programTitle,
-    departmentAcronym,
-  };
+function handleProgramRow(row: string[]): void {
+  const isProgramRow = row[0] === 'Curso:' && row[1].split(' - ').length > 1;
+
+  if (isProgramRow) {
+    const [programTitle, departmentAcronym] = row[1].split(' - ')[0].split('/');
+    academicHistory.programTitle = programTitle;
+    academicHistory.departmentAcronym = departmentAcronym;
+  }
 }
 
-function getCurriculumId(rows: string[][]) {
-  const curriculumRow = rows[13];
-  const curriculumId = curriculumRow[1].split(' ')[0];
+function handleCurriculumRow(row: string[]): void {
+  const isCurriculumRow = row[0] === 'Currículo:';
 
-  return curriculumId;
+  if (isCurriculumRow) {
+    const curriculumId = row[1].split(' ')[0];
+    academicHistory.curriculumId = curriculumId;
+  }
+}
+
+function handleRequiredWorkloadRow(row: string[]): void {
+  const isRequiredWorkloadRow = row[0] === 'Exigido';
+
+  if (isRequiredWorkloadRow) {
+    const [, mandatory, elective, complementary, total] = row;
+    academicHistory.requiredWorkload = {
+      mandatory: parseInt(mandatory, 10),
+      elective: parseInt(elective, 10),
+      complementary: parseInt(complementary, 10),
+      total: parseInt(total, 10),
+    };
+  }
+}
+
+function handleCompletedWorkloadRow(row: string[]): void {
+  const isCompletedWorkloadRow = row[0] === 'Integralizado';
+
+  if (isCompletedWorkloadRow) {
+    const [, mandatory, elective, complementary, total] = row;
+    academicHistory.completedWorkload = {
+      mandatory: parseInt(mandatory, 10),
+      elective: parseInt(elective, 10),
+      complementary: parseInt(complementary, 10),
+      total: parseInt(total, 10),
+    };
+  }
+}
+
+function handleRemainingWorkloadRow(row: string[]): void {
+  const isRemainingWorkloadRow = row[0] === 'Pendente';
+
+  if (isRemainingWorkloadRow) {
+    const [, mandatory, elective, complementary, total] = row;
+    academicHistory.remainingWorkload = {
+      mandatory: parseInt(mandatory, 10),
+      elective: parseInt(elective, 10),
+      complementary: parseInt(complementary, 10),
+      total: parseInt(total, 10),
+    };
+  }
 }
 
 function callback(error: unknown, rows: string[][]) {
@@ -30,10 +91,15 @@ function callback(error: unknown, rows: string[][]) {
     return console.log(error);
   }
 
-  const { programTitle, departmentAcronym } = getProgram(rows);
-  const curriculumId = getCurriculumId(rows);
+  rows.forEach((row) => {
+    handleProgramRow(row);
+    handleCurriculumRow(row);
+    handleRequiredWorkloadRow(row);
+    handleCompletedWorkloadRow(row);
+    handleRemainingWorkloadRow(row);
+  });
 
-  console.log({ departmentAcronym, programTitle, curriculumId });
+  console.log(academicHistory);
 }
 
 pdf2table.parse(file, callback);
