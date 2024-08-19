@@ -1,6 +1,7 @@
 {
   "ts-node": {
-    "require": ["tsconfig-paths/register", "dotenv/config"]
+    "require": ["tsconfig-paths/register", "dotenv/config"],
+    "files": true
   },
   "compilerOptions": {
     "target": "esnext",
