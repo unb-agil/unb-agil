@@ -1,9 +1,12 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { Request, Response, NextFunction } from 'express';
+import multer from 'multer';
 
 import { AppDataSource } from '@/data-source';
 import { Routes } from '@/routes';
+
+const upload = multer({ dest: 'uploads/' });
 
 AppDataSource.initialize()
   .then(async () => {
@@ -11,8 +14,15 @@ AppDataSource.initialize()
     app.use(bodyParser.json());
 
     Routes.forEach((route) => {
+      const middlewares = [];
+
+      if (route.upload) {
+        middlewares.push(upload.single(route.upload));
+      }
+
       app[route.method](
         route.route,
+        ...middlewares,
         (req: Request, res: Response, next: NextFunction) => {
           const result = new route.controller()[route.action](req, res, next);
           if (result instanceof Promise) {

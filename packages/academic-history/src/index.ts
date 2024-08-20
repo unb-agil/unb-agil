@@ -1,28 +1,7 @@
-import path from 'path';
 import fs from 'fs';
 import pdf2table from 'pdf2table';
 
-interface Workload {
-  mandatory: number;
-  elective: number;
-  complementary: number;
-  total: number;
-}
-
-interface AcademicHistory {
-  programTitle?: string;
-  departmentAcronym?: string;
-  curriculumId?: string;
-  requiredWorkload?: Workload;
-  completedWorkload?: Workload;
-  remainingWorkload?: Workload;
-  remainingCourseSigaaIds?: string[];
-}
-
-const RELATIVE_PATH = './historico_170105342.pdf';
-
-const absolutePath = path.resolve(__dirname, RELATIVE_PATH);
-const file = fs.readFileSync(absolutePath);
+import { AcademicHistory } from './models';
 
 const academicHistory: AcademicHistory = {};
 
@@ -110,21 +89,25 @@ function handleRemainingCourses(rows: string[][], index: number): void {
   );
 }
 
-function callback(error: unknown, rows: string[][]) {
-  if (error) {
-    return console.log(error);
-  }
+export function extractAcademicHistory(filePath: string) {
+  const file = fs.readFileSync(filePath);
 
-  rows.forEach((row, index) => {
-    handleProgramRow(row);
-    handleCurriculumRow(row);
-    handleRequiredWorkloadRow(row);
-    handleCompletedWorkloadRow(row);
-    handleRemainingWorkloadRow(row);
-    handleRemainingCourses(rows, index);
+  return new Promise<AcademicHistory>((resolve, reject) => {
+    pdf2table.parse(file, (error: unknown, rows: string[][]) => {
+      if (error) {
+        return reject(error);
+      }
+
+      rows.forEach((row, index) => {
+        handleProgramRow(row);
+        handleCurriculumRow(row);
+        handleRequiredWorkloadRow(row);
+        handleCompletedWorkloadRow(row);
+        handleRemainingWorkloadRow(row);
+        handleRemainingCourses(rows, index);
+      });
+
+      resolve(academicHistory);
+    });
   });
-
-  console.log(academicHistory);
 }
-
-pdf2table.parse(file, callback);

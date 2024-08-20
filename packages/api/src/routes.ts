@@ -3,6 +3,7 @@ import ProgramController from '@/controller/ProgramController';
 import CurriculumController from '@/controller/CurriculumController';
 import CurriculumComponentController from '@/controller/CurriculumComponentController';
 import ComponentController from '@/controller/ComponentController';
+import AcademicHistoryController from '@/controller/AcademicHistoryController';
 
 export const Routes = [
   {
@@ -70,5 +71,12 @@ export const Routes = [
     route: '/curricula-components',
     controller: CurriculumComponentController,
     action: 'batchSaveOrUpdate',
+  },
+  {
+    method: 'post',
+    route: '/academic-history',
+    controller: AcademicHistoryController,
+    action: 'extract',
+    upload: 'file',
   },
 ];
