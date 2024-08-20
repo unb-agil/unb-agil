@@ -77,10 +77,11 @@ As mensagens de _commit_ seguem o padrão [Conventional Commits](https://www.con
 
 1. **Gerar grafo (DAG)**: O grafo representa as disciplinas e seus pré-requisitos. Cada nó é uma disciplina e cada aresta indica uma dependência. Os pré-requisitos, co-requisitos e disciplinas equivalentes devem ser escolhidos seguindo a prioridade:
 
-   1. Maior quantidade de disciplinas obrigatórias no currículo: _reaproveita disciplinas que serão cursadas_;
+   1. Maior proporção de disciplinas obrigatórias no currículo: _reaproveita disciplinas que serão cursadas_;
    2. ~~Maior quantidade de turmas~~ (`MVP2`): _flexibiliza a grade horária_;
    3. Menor carga horária.
 
 2. **Gerar fluxo**: O fluxo representa as disciplinas que devem ser cursadas na menor quantidade de períodos possível. Cada período deve ter no máximo a quantidade de créditos especificada. As disciplinas devem ser ordenadas seguindo a prioridade:
+
    1. Maior quantidade de períodos bloqueados: _aumenta a prioridade de disciplinas optativas que bloqueiam vários semestres_.
    2. Menor período recomendado no fluxo padrão do currículo: _aproxima a recomendação do fluxo padrão do currículo_.
