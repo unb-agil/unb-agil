@@ -5,9 +5,11 @@
 - [Scraper](./packages/scraper/README.md)
 - [API](./packages/api/README.md)
 
-## Configuração do ambiente de desenvolvimento
+## Ambiente de desenvolvimento
 
-### NVM
+### Configurações gerais iniciais
+
+#### NVM
 
 Para facilitar a gestão de versões do Node.js em diferentes projetos, é sugerida a utilização do [Node Version Manager](https://github.com/nvm-sh/nvm).
 
@@ -23,7 +25,7 @@ Se a versão do Node.js especificada no arquivo .nvmrc não estiver instalada, v
 nvm install
 ```
 
-### Yarn
+#### Yarn
 
 O Yarn é utilizado como gerenciador de pacotes neste projeto. Para instalá-lo, siga as instruções abaixo:
 
@@ -39,9 +41,20 @@ Instale as dependências do projeto:
 yarn install
 ```
 
-### Configuração do VSCode
+#### Configuração do VSCode
 
 Recomenda-se utilizar a extensão Prettier para formatação de código. As configurações recomendadas para extensões estão no arquivo .vscode/extensions.json.
+
+### Mensagens de commit
+
+As mensagens de _commit_ seguem o padrão [Conventional Commits](https://www.conventionalcommits.org/) (`tipo(escopo): descrição`) com os seguintes escopos específicos do projeto:
+
+- `api` API;
+- `db` Banco de dados;
+- `hist` Histórico acadêmico;
+- `rec` Recomendação de disciplinas;
+- `scraper` Web scraping do SIGAA;
+- `web` Front-end;
 
 ## Scraper
 
