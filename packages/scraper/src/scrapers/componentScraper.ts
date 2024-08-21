@@ -1,6 +1,8 @@
 import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
+import requisites from '@unb-agil/requisites-parser';
+
 import puppeteerSetup from '@/config/puppeteer';
 import BaseScraper from '@/scrapers/baseScraper';
 import ProgramScraper from '@/scrapers/programScraper';
@@ -8,7 +10,6 @@ import CurriculumScraper from '@/scrapers/curriculumScraper';
 import CurriculumComponentScraper from '@/scrapers/curriculumComponentScraper';
 import DepartmentService from '@/services/departmentService';
 import ComponentService from '@/services/componentService';
-import { parseRequisites } from '@/utils/requisites';
 import { COMPONENTS_LINK } from '@/constants';
 import {
   Component,
@@ -79,9 +80,9 @@ class ComponentScraper implements BaseScraper {
       sigaaId,
       title,
       type: this.parseComponentType(type),
-      prerequisites: parseRequisites(rawPre),
-      corequisites: parseRequisites(rawCo),
-      equivalences: parseRequisites(rawEq),
+      prerequisites: requisites.parseRaw(rawPre),
+      corequisites: requisites.parseRaw(rawCo),
+      equivalences: requisites.parseRaw(rawEq),
       departmentSigaaId: department.sigaaId,
     };
 

@@ -1,3 +1,5 @@
+import { RequisitesExpression } from '@unb-agil/requisites-parser';
+
 export interface ComponentScraperOptions {
   programSigaaId?: number;
   componentSigaaId?: string;
@@ -28,9 +30,3 @@ export interface Component {
   corequisites: RequisitesExpression;
   equivalences: RequisitesExpression;
 }
-
-export type RequisitesExpression =
-  | null
-  | string
-  | { and: RequisitesExpression[] }
-  | { or: RequisitesExpression[] };

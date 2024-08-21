@@ -14,7 +14,8 @@
     "mysql2": "^3.11.0",
     "reflect-metadata": "^0.1.13",
     "typeorm": "0.3.20",
-    "@unb-agil/academic-history": "*"
+    "@unb-agil/academic-history": "*",
+    "@unb-agil/requisites-parser": "*"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.5",

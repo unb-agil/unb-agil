@@ -136,7 +136,7 @@ function parse(expression: string): RequisitesExpression {
   return JSON.parse(expression);
 }
 
-function stringify(expression: RequisitesExpression): string | null {
+function stringify(expression: RequisitesExpression) {
   return typeof expression === 'string' || !expression
     ? expression
     : JSON.stringify(expression);
