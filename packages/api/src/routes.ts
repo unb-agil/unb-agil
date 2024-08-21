@@ -4,6 +4,7 @@ import CurriculumController from '@/controller/CurriculumController';
 import CurriculumComponentController from '@/controller/CurriculumComponentController';
 import ComponentController from '@/controller/ComponentController';
 import AcademicHistoryController from '@/controller/AcademicHistoryController';
+import RecommendationController from '@/controller/RecommendationController';
 
 export const Routes = [
   {
@@ -84,5 +85,11 @@ export const Routes = [
     route: '/curriculum/period-workload/:sigaaId',
     controller: CurriculumController,
     action: 'getPeriodWorkload',
+  },
+  {
+    method: 'post',
+    route: '/recommendation',
+    controller: RecommendationController,
+    action: 'recommend',
   },
 ];

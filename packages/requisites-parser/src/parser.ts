@@ -133,7 +133,11 @@ function parseRaw(expression: string): RequisitesExpression {
 }
 
 function parse(expression: string): RequisitesExpression {
-  return JSON.parse(expression);
+  try {
+    return JSON.parse(expression);
+  } catch {
+    return expression;
+  }
 }
 
 function stringify(expression: RequisitesExpression) {
