@@ -52,6 +52,17 @@ class CurriculumController {
     const curriculum = await this.repository.findOneBy({ sigaaId });
     return curriculum.program;
   }
+  
+
+  async getPeriodWorkload(request: Request) {
+    const sigaaId = decodeURIComponent(request.params.sigaaId);
+  
+    const {minPeriodWorkload, maxPeriodWorkload} = await this.repository.findOneBy({ sigaaId });
+    
+    return {minPeriodWorkload, maxPeriodWorkload}
+  
+  }
+  
 }
 
 export default CurriculumController;

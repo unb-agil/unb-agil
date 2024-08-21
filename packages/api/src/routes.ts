@@ -79,4 +79,10 @@ export const Routes = [
     action: 'extract',
     upload: 'file',
   },
+  {
+    method: 'get',
+    route: '/curriculum/period-workload/:sigaaId',
+    controller: CurriculumController,
+    action: 'getPeriodWorkload',
+  },
 ];
