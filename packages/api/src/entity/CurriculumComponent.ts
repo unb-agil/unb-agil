@@ -30,6 +30,9 @@ class CurriculumComponent {
 
   @ManyToOne(() => Component, (component) => component.curriculumComponent)
   component: Component;
+
+  @Column({ nullable: true })
+  componentSigaaId: Component['sigaaId'];
 }
 
 export default CurriculumComponent;
