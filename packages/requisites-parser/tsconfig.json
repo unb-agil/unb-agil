@@ -1,0 +1,3 @@
+{
+  "extends": "@unb-agil/typescript-config/tsconfig.base.json"
+}

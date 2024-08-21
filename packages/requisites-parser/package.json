@@ -1,0 +1,10 @@
+{
+  "name": "@unb-agil/requisites-parser",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "devDependencies": {
+    "@unb-agil/eslint-config": "*",
+    "@unb-agil/typescript-config": "*"
+  }
+}
