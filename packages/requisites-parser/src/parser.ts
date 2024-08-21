@@ -142,10 +142,40 @@ function stringify(expression: RequisitesExpression) {
     : JSON.stringify(expression);
 }
 
+function options(expression: RequisitesExpression): string[][] {
+  if (!expression) {
+    return [];
+  }
+
+  if (typeof expression === 'string') {
+    return [[expression]];
+  }
+
+  if ('and' in expression) {
+    return expression.and.reduce<string[][]>(
+      (acc, current) => {
+        const currentOptions = options(current);
+
+        return acc.flatMap((option) =>
+          currentOptions.map((currentOption) => [...option, ...currentOption]),
+        );
+      },
+      [[]],
+    );
+  }
+
+  if ('or' in expression) {
+    return expression.or.flatMap(options);
+  }
+
+  throw new Error(`Unknown expression: ${expression}`);
+}
+
 const requisites = {
   parse,
   parseRaw,
   stringify,
+  options,
 };
 
 export default requisites;
