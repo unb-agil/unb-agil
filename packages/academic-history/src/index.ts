@@ -1,92 +1,146 @@
 import fs from 'fs';
 import pdf2table from 'pdf2table';
-
 import { AcademicHistory } from './models';
 
-const academicHistory: AcademicHistory = {};
+const academicHistory: AcademicHistory = {
+  programTitle: '',
+  departmentAcronym: '',
+  curriculumSigaaId: '',
+  components: {
+    completed: [],
+    remaining: [],
+  },
+  workloads: {
+    required: {
+      mandatory: 0,
+      elective: 0,
+      complementary: 0,
+      total: 0,
+    },
+    completed: {
+      mandatory: 0,
+      elective: 0,
+      complementary: 0,
+      total: 0,
+    },
+    remaining: {
+      mandatory: 0,
+      elective: 0,
+      complementary: 0,
+      total: 0,
+    },
+  },
+};
 
-function handleProgramRow(row: string[]): void {
+function handleProgramRow(row: string[]) {
   const isProgramRow = row[0] === 'Curso:' && row[1].split(' - ').length > 1;
 
-  if (isProgramRow) {
-    const [programTitle, departmentAcronym] = row[1].split(' - ')[0].split('/');
-    academicHistory.programTitle = programTitle;
-    academicHistory.departmentAcronym = departmentAcronym;
-  }
-}
-
-function handleCurriculumRow(row: string[]): void {
-  const isCurriculumRow = row[0] === 'Currículo:';
-
-  if (isCurriculumRow) {
-    const curriculumId = row[1].split(' ')[0];
-    academicHistory.curriculumId = curriculumId;
-  }
-}
-
-function handleRequiredWorkloadRow(row: string[]): void {
-  const isRequiredWorkloadRow = row[0] === 'Exigido';
-
-  if (isRequiredWorkloadRow) {
-    const [, mandatory, elective, complementary, total] = row;
-    academicHistory.requiredWorkload = {
-      mandatory: parseInt(mandatory, 10),
-      elective: parseInt(elective, 10),
-      complementary: parseInt(complementary, 10),
-      total: parseInt(total, 10),
-    };
-  }
-}
-
-function handleCompletedWorkloadRow(row: string[]): void {
-  const isCompletedWorkloadRow = row[0] === 'Integralizado';
-
-  if (isCompletedWorkloadRow) {
-    const [, mandatory, elective, complementary, total] = row;
-    academicHistory.completedWorkload = {
-      mandatory: parseInt(mandatory, 10),
-      elective: parseInt(elective, 10),
-      complementary: parseInt(complementary, 10),
-      total: parseInt(total, 10),
-    };
-  }
-}
-
-function handleRemainingWorkloadRow(row: string[]): void {
-  const isRemainingWorkloadRow = row[0] === 'Pendente';
-
-  if (isRemainingWorkloadRow) {
-    const [, mandatory, elective, complementary, total] = row;
-    academicHistory.remainingWorkload = {
-      mandatory: parseInt(mandatory, 10),
-      elective: parseInt(elective, 10),
-      complementary: parseInt(complementary, 10),
-      total: parseInt(total, 10),
-    };
-  }
-}
-
-function handleRemainingCourses(rows: string[][], index: number): void {
-  const isRemainingCoursesHeaderRow =
-    rows[index].at(0) === 'Código' &&
-    rows[index].at(1) === 'Componente Curricular' &&
-    rows[index].at(2) === 'CH';
-
-  if (!isRemainingCoursesHeaderRow) {
+  if (!isProgramRow) {
     return;
   }
 
-  const remainingCourses = rows.slice(index + 1).filter((row) => {
-    if (row.length === 3 || row.length === 4) {
-      return row.at(-1)?.match(/\d+ h$/);
-    }
-  });
+  const [programTitle, departmentAcronym] = row[1].split(' - ')[0].split('/');
+  academicHistory.programTitle = programTitle;
+  academicHistory.departmentAcronym = departmentAcronym;
+}
 
-  const remainingCourseSigaaIds = remainingCourses.map((row) => row[0]);
+function handleCurriculumRow(row: string[]) {
+  const isCurriculumRow = row[0] === 'Currículo:';
 
-  academicHistory.remainingCourseSigaaIds = Array.from(
-    new Set(remainingCourseSigaaIds),
-  );
+  if (!isCurriculumRow) {
+    return;
+  }
+
+  const curriculumId = row[1].split(' ')[0];
+  academicHistory.curriculumSigaaId = curriculumId;
+}
+
+function handleRequiredWorkloadRow(row: string[]) {
+  const isRequiredWorkloadRow = row[0] === 'Exigido';
+
+  if (!isRequiredWorkloadRow) {
+    return;
+  }
+
+  const [, mandatory, elective, complementary, total] = row;
+
+  academicHistory.workloads.required = {
+    mandatory: parseInt(mandatory),
+    elective: parseInt(elective),
+    complementary: parseInt(complementary),
+    total: parseInt(total),
+  };
+}
+
+function handleCompletedWorkloadRow(row: string[]) {
+  const isCompletedWorkloadRow = row[0] === 'Integralizado';
+
+  if (!isCompletedWorkloadRow) {
+    return;
+  }
+
+  const [, mandatory, elective, complementary, total] = row;
+
+  academicHistory.workloads.completed = {
+    mandatory: parseInt(mandatory),
+    elective: parseInt(elective),
+    complementary: parseInt(complementary),
+    total: parseInt(total),
+  };
+}
+
+function handleRemainingWorkloadRow(row: string[]) {
+  const isRemainingWorkloadRow = row[0] === 'Pendente';
+
+  if (!isRemainingWorkloadRow) {
+    return;
+  }
+
+  const [, mandatory, elective, complementary, total] = row;
+
+  academicHistory.workloads.remaining = {
+    mandatory: parseInt(mandatory),
+    elective: parseInt(elective),
+    complementary: parseInt(complementary),
+    total: parseInt(total),
+  };
+}
+
+function handleWorkloadRow(row: string[]) {
+  handleRequiredWorkloadRow(row);
+  handleCompletedWorkloadRow(row);
+  handleRemainingWorkloadRow(row);
+}
+
+function handleCompletedComponentRow(row: string[]) {
+  const isCompletedComponentRow = row.at(-1) === 'APR';
+
+  if (!isCompletedComponentRow) {
+    return;
+  }
+
+  const componentSigaaId = row
+    .slice(1, 3)
+    .find((element) => element.match(/[A-Z]+\d+/));
+
+  if (!componentSigaaId) {
+    return;
+  }
+
+  academicHistory.components.completed.push(componentSigaaId);
+}
+
+function handleRemainingComponentRow(row: string[]) {
+  const isLastColumnWorkload = row.at(-1)?.match(/\d+ h$/);
+  const hasRowLength = row.length === 3 || row.length === 4;
+  const isRemainingComponentRow = isLastColumnWorkload && hasRowLength;
+
+  if (!isRemainingComponentRow) {
+    return;
+  }
+
+  const componentSigaaId = row[0];
+  academicHistory.components.remaining.push(componentSigaaId);
 }
 
 export function extractAcademicHistory(filePath: string) {
@@ -98,13 +152,12 @@ export function extractAcademicHistory(filePath: string) {
         return reject(error);
       }
 
-      rows.forEach((row, index) => {
+      rows.forEach((row) => {
         handleProgramRow(row);
         handleCurriculumRow(row);
-        handleRequiredWorkloadRow(row);
-        handleCompletedWorkloadRow(row);
-        handleRemainingWorkloadRow(row);
-        handleRemainingCourses(rows, index);
+        handleWorkloadRow(row);
+        handleCompletedComponentRow(row);
+        handleRemainingComponentRow(row);
       });
 
       resolve(academicHistory);

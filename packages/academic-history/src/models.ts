@@ -5,12 +5,21 @@ export interface Workload {
   total: number;
 }
 
+export interface Workloads {
+  required: Workload;
+  completed: Workload;
+  remaining: Workload;
+}
+
+export interface Components {
+  completed: string[];
+  remaining: string[];
+}
+
 export interface AcademicHistory {
-  programTitle?: string;
-  departmentAcronym?: string;
-  curriculumId?: string;
-  requiredWorkload?: Workload;
-  completedWorkload?: Workload;
-  remainingWorkload?: Workload;
-  remainingCourseSigaaIds?: string[];
+  programTitle: string;
+  departmentAcronym: string;
+  curriculumSigaaId: string;
+  workloads: Workloads;
+  components: Components;
 }
