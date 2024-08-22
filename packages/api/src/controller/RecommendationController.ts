@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { In } from 'typeorm';
 
-import requisites, { RequisitesExpression } from '@unb-agil/requisites-parser';
+import requisites from '@unb-agil/requisites-parser';
 
 import { AppDataSource } from '@/data-source';
 import Curriculum from '@/entity/Curriculum';
@@ -18,14 +18,6 @@ interface RecommendationRequestBody {
 
 type RecommendationRequest = Request<never, never, RecommendationRequestBody>;
 
-type RequisiteType = 'prerequisites' | 'corequisites' | 'equivalences';
-
-type ParsedComponent = Omit<Component, RequisiteType> & {
-  prerequisites: RequisitesExpression;
-  corequisites: RequisitesExpression;
-  equivalences: RequisitesExpression;
-};
-
 type RequisitesGraph = Map<Component['sigaaId'], Component['sigaaId'][]>;
 
 class RecommendationController {
@@ -39,7 +31,7 @@ class RecommendationController {
       request.body;
 
     const curriculum = await this.findCurriculum(curriculumSigaaId);
-    const components = await this.findParsedComponents(componentIds);
+    const components = await this.findComponents(componentIds);
 
     await this.generateGraph(curriculum, components);
   }
@@ -48,25 +40,11 @@ class RecommendationController {
     return await this.curriculumRepository.findOneBy({ sigaaId });
   }
 
-  async findParsedComponents(sigaaIds: string[]) {
-    const components = await this.findComponents(sigaaIds);
-    return this.parseComponents(components);
-  }
-
   async findComponents(sigaaIds: string[]) {
     return await this.componentRepository.findBy({ sigaaId: In(sigaaIds) });
   }
 
-  parseComponents(components: Component[]): ParsedComponent[] {
-    return components.map((component) => ({
-      ...component,
-      prerequisites: requisites.parse(component.prerequisites),
-      corequisites: requisites.parse(component.corequisites),
-      equivalences: requisites.parse(component.equivalences),
-    }));
-  }
-
-  async generateGraph(curriculum: Curriculum, components: ParsedComponent[]) {
+  async generateGraph(curriculum: Curriculum, components: Component[]) {
     this.initializeGraph();
     await this.handleRequisites(curriculum, components);
   }
@@ -75,10 +53,7 @@ class RecommendationController {
     this.graph = new Map<Component['sigaaId'], Component['sigaaId'][]>();
   }
 
-  async handleRequisites(
-    curriculum: Curriculum,
-    components: ParsedComponent[],
-  ) {
+  async handleRequisites(curriculum: Curriculum, components: Component[]) {
     for (const component of components) {
       const sigaaIdOptions = requisites.options(component.prerequisites);
 
@@ -106,11 +81,11 @@ class RecommendationController {
 
   async fetchParsedOptionComponents(options: Component['sigaaId'][][]) {
     return await Promise.all(
-      options.map(async (option) => await this.findParsedComponents(option)),
+      options.map(async (option) => await this.findComponents(option)),
     );
   }
 
-  async evaluateOptions(curriculum: Curriculum, options: ParsedComponent[][]) {
+  async evaluateOptions(curriculum: Curriculum, options: Component[][]) {
     let bestOption = options[0];
     let bestProportion = await this.evaluateOption(curriculum, bestOption);
 
@@ -129,7 +104,7 @@ class RecommendationController {
     return bestOption;
   }
 
-  async evaluateOption(curriculum: Curriculum, option: ParsedComponent[]) {
+  async evaluateOption(curriculum: Curriculum, option: Component[]) {
     const mandatoryStatuses = await Promise.all(
       option.map(({ sigaaId }) =>
         this.isComponentMandatory(curriculum, sigaaId),

@@ -1,8 +1,5 @@
 import { Request } from 'express';
 import { AppDataSource } from '@/data-source';
-
-import requisites from '@unb-agil/requisites-parser';
-
 import Component from '@/entity/Component';
 
 class ComponentController {
@@ -16,15 +13,7 @@ class ComponentController {
 
   async saveOrUpdate(request: Request) {
     const component = request.body;
-
-    const formattedComponent = {
-      ...component,
-      prerequisites: requisites.stringify(component.prerequisites),
-      corequisites: requisites.stringify(component.corequisites),
-      equivalences: requisites.stringify(component.equivalences),
-    };
-
-    return this.repository.save(formattedComponent);
+    return this.repository.save(component);
   }
 }
 

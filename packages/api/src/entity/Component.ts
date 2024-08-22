@@ -1,4 +1,5 @@
 import { Entity, Column, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import { RequisitesExpression } from '@unb-agil/requisites-parser';
 import Department from '@/entity/Department';
 import CurriculumComponent from '@/entity/CurriculumComponent';
 
@@ -20,14 +21,14 @@ class Component {
   @Column({ type: 'enum', enum: ComponentType, nullable: true })
   type: ComponentType;
 
-  @Column({ type: 'varchar', nullable: true })
-  prerequisites: string;
+  @Column({ type: 'simple-json', nullable: true })
+  prerequisites: RequisitesExpression;
 
-  @Column({ type: 'varchar', nullable: true })
-  corequisites: string;
+  @Column({ type: 'simple-json', nullable: true })
+  corequisites: RequisitesExpression;
 
-  @Column({ type: 'varchar', nullable: true })
-  equivalences: string;
+  @Column({ type: 'simple-json', nullable: true })
+  equivalences: RequisitesExpression;
 
   @OneToMany(
     () => CurriculumComponent,
