@@ -86,22 +86,17 @@ class RecommendationController {
   }
 
   async evaluateOptions(curriculum: Curriculum, options: Component[][]) {
-    let bestOption = options[0];
-    let bestProportion = await this.evaluateOption(curriculum, bestOption);
+    return options.reduce(async (bestOptionPromise, currentOption) => {
+      const bestOption = await bestOptionPromise;
 
-    for (const currentOption of options) {
+      const bestProportion = await this.evaluateOption(curriculum, bestOption);
       const currentProportion = await this.evaluateOption(
         curriculum,
         currentOption,
       );
 
-      if (currentProportion > bestProportion) {
-        bestOption = currentOption;
-        bestProportion = currentProportion;
-      }
-    }
-
-    return bestOption;
+      return currentProportion > bestProportion ? currentOption : bestOption;
+    }, Promise.resolve(options[0]));
   }
 
   async evaluateOption(curriculum: Curriculum, option: Component[]) {
