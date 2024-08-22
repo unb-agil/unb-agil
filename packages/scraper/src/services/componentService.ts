@@ -12,7 +12,7 @@ class ComponentService {
   }
 
   async saveOrUpdate(component: Component): Promise<void> {
-    log(`Atualizando componente ${bold(component.sigaaId)}`);
+    log(`Atualizando componente ${bold(component.title)}`);
     await axiosInstance.post('/components', component);
   }
 }
