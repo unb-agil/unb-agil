@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 
@@ -11,6 +12,7 @@ const upload = multer({ dest: 'uploads/' });
 AppDataSource.initialize()
   .then(async () => {
     const app = express();
+    app.use(cors());
     app.use(bodyParser.json());
 
     Routes.forEach((route) => {

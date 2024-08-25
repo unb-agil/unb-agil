@@ -12,6 +12,38 @@ const FileUpload = () => {
     fileInputRef.current.click();
   };
 
+  const handleFileUpload = async () => {
+    if (!selectedFile) {
+      alert('Nenhum arquivo selecionado');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch('http://localhost:3000/academic-history', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro na solicitação');
+      }
+
+      const data = await response.json();
+
+      if (data.curriculumId) {
+        localStorage.setItem('curriculumId', data.curriculumId);
+        alert('Curriculum ID salvo com sucesso no localStorage!');
+      } else {
+        alert('Curriculum ID não encontrado na resposta');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer upload do arquivo:', error);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <label style={styles.label}>
@@ -22,11 +54,22 @@ const FileUpload = () => {
           style={styles.input}
           onChange={handleFileChange}
         />
-        <button type="button" style={styles.button} onClick={handleButtonClick}>
+        <button
+          type="button"
+          style={styles.button}
+          onClick={handleButtonClick}
+        >
           <span style={styles.icon}>📄</span>
           <span>{selectedFile ? selectedFile.name : 'Selecionar Histórico'}</span>
         </button>
       </label>
+      <button
+        type="button"
+        style={styles.uploadButton}
+        onClick={handleFileUpload}
+      >
+        Enviar
+      </button>
     </div>
   );
 };
@@ -34,6 +77,7 @@ const FileUpload = () => {
 const styles = {
   container: {
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: '70vh',
@@ -67,6 +111,18 @@ const styles = {
   icon: {
     marginRight: '10px',
     fontSize: '20px',
+  },
+  uploadButton: {
+    marginTop: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '10px 20px',
+    backgroundColor: '#08483c',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
   },
 };
 

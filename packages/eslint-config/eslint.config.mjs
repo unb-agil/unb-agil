@@ -9,4 +9,17 @@ export default tseslint.config(
   ...tseslint.configs.strict,
   ...tseslint.configs.stylistic,
   eslintConfigPrettier,
+  {
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: "module",
+      globals: {
+        alert: "readonly",
+        FormData: "readonly",
+        fetch: "readonly",
+        localStorage: "readonly",
+        console: "readonly",
+      },
+    }
+  }
 );
