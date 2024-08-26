@@ -36,7 +36,20 @@ const FileUpload = () => {
       const data = await response.json();
 
       if (data.curriculumSigaaId) {
+        const encodedSigaaId = encodeURIComponent(data.curriculumSigaaId);
+
+        const workloadResponse = await fetch(`http://localhost:3000/curriculum/period-workload/${encodedSigaaId}`);
+        
+        if (!workloadResponse.ok) {
+          throw new Error('Erro na solicitação de workload');
+        }
+
+        const workloadData = await workloadResponse.json();
+        
         localStorage.setItem('curriculumSigaaId', data.curriculumSigaaId);
+        localStorage.setItem('minPeriodWorkload', workloadData.minPeriodWorkload);
+        localStorage.setItem('maxPeriodWorkload', workloadData.maxPeriodWorkload);
+
         setCurriculumSigaaId(data.curriculumSigaaId);
         alert('Curriculum ID salvo com sucesso no localStorage!');
       } else {

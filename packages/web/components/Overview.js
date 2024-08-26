@@ -9,12 +9,11 @@ const Overview = () => {
   const [sliderMax, setSliderMax] = useState(100);
 
   useEffect(() => {
-    // Recuperando valores do localStorage
     const total = localStorage.getItem('totalIntegrated') || 0;
     const mandatory = localStorage.getItem('mandatoryIntegrated') || 0;
     const elective = localStorage.getItem('electiveIntegrated') || 0;
-    const min = localStorage.getItem('sliderMin') || 0;
-    const max = localStorage.getItem('sliderMax') || 100;
+    const min = localStorage.getItem('minPeriodWorkload') || 0;
+    const max = localStorage.getItem('maxPeriodWorkload') || 100;
 
     setTotalIntegrated(total);
     setMandatoryIntegrated(mandatory);
@@ -29,12 +28,10 @@ const Overview = () => {
   };
 
   const handleProcessClick = () => {
-    // Lógica para o botão de processar
     console.log('Processar', sliderValue);
   };
 
   const handleCancelClick = () => {
-    // Lógica para o botão de cancelar
     setSliderValue(sliderMin);
   };
 
@@ -55,6 +52,7 @@ const Overview = () => {
           onChange={handleSliderChange}
           style={styles.slider}
         />
+        <div style={styles.sliderValue}>{sliderValue}</div>
         <div style={styles.buttonContainer}>
           <button onClick={handleCancelClick} style={styles.cancelButton}>
             Cancelar
@@ -90,6 +88,10 @@ const styles = {
   slider: {
     width: '100%',
     marginBottom: '10px',
+  },
+  sliderValue: {
+    marginBottom: '10px',
+    fontSize: '18px',
   },
   buttonContainer: {
     display: 'flex',
