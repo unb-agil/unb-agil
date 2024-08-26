@@ -1,6 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
+import CurriculumContext from '../contexts/CurriculumContext';
 
 const FileUpload = () => {
+  const { setCurriculumSigaaId } = useContext(CurriculumContext);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -35,6 +37,7 @@ const FileUpload = () => {
 
       if (data.curriculumSigaaId) {
         localStorage.setItem('curriculumSigaaId', data.curriculumSigaaId);
+        setCurriculumSigaaId(data.curriculumSigaaId);
         alert('Curriculum ID salvo com sucesso no localStorage!');
       } else {
         alert('Curriculum ID não encontrado na resposta');
