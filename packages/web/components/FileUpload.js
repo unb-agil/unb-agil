@@ -45,7 +45,23 @@ const FileUpload = () => {
         }
 
         const workloadData = await workloadResponse.json();
+
+        const { required, remaining } = data.workloads;
         
+        const calculatePercentage = (required, remaining) => {
+          if (required === 0) return 0;
+          const completed = required - remaining;
+          const percentage = (completed / required) * 100;
+          return percentage > 100 ? 100 : percentage;
+        };
+
+        const totalPercentage = calculatePercentage(required.total, remaining.total);
+        const mandatoryPercentage = calculatePercentage(required.mandatory, remaining.mandatory);
+        const electivePercentage = calculatePercentage(required.elective, remaining.elective);
+
+        localStorage.setItem('totalIntegrated', totalPercentage.toFixed(2));
+        localStorage.setItem('mandatoryIntegrated', mandatoryPercentage.toFixed(2));
+        localStorage.setItem('electiveIntegrated', electivePercentage.toFixed(2));
         localStorage.setItem('curriculumSigaaId', data.curriculumSigaaId);
         localStorage.setItem('minPeriodWorkload', workloadData.minPeriodWorkload);
         localStorage.setItem('maxPeriodWorkload', workloadData.maxPeriodWorkload);
