@@ -33,8 +33,8 @@ const FileUpload = () => {
 
       const data = await response.json();
 
-      if (data.curriculumId) {
-        localStorage.setItem('curriculumId', data.curriculumId);
+      if (data.curriculumSigaaId) {
+        localStorage.setItem('curriculumSigaaId', data.curriculumSigaaId);
         alert('Curriculum ID salvo com sucesso no localStorage!');
       } else {
         alert('Curriculum ID não encontrado na resposta');
