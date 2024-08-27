@@ -178,3 +178,5 @@ export function extractAcademicHistory(filePath: string) {
     });
   });
 }
+
+export type { AcademicHistory };

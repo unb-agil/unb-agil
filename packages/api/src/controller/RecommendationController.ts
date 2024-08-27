@@ -1,7 +1,8 @@
 import { Request } from 'express';
 import { In } from 'typeorm';
 
-import requisites from '@unb-agil/requisites-parser';
+import requisites, { RequisitesExpression } from '@unb-agil/requisites-parser';
+import { AcademicHistory } from '@unb-agil/academic-history';
 
 import { AppDataSource } from '@/data-source';
 import Curriculum from '@/entity/Curriculum';
@@ -10,30 +11,22 @@ import CurriculumComponent, {
   CurriculumComponentType,
 } from '@/entity/CurriculumComponent';
 
-interface RecommendationRequestBody {
-  curriculumSigaaId: string;
-  maxCreditsByPeriod: number;
-  remainingComponentSigaaIds: string[];
-}
-
-type RecommendationRequest = Request<never, never, RecommendationRequestBody>;
-
+type RecommendationRequest = Request<never, never, AcademicHistory>;
 type RequisitesGraph = Map<Component['sigaaId'], Component['sigaaId'][]>;
 
 class RecommendationController {
   private graph: RequisitesGraph;
+  private academicHistory: AcademicHistory;
+
   private curriculumRepository = AppDataSource.getRepository(Curriculum);
   private currCompRepository = AppDataSource.getRepository(CurriculumComponent);
   private componentRepository = AppDataSource.getRepository(Component);
 
   async recommend(request: RecommendationRequest) {
-    const { curriculumSigaaId, remainingComponentSigaaIds: componentIds } =
-      request.body;
+    this.academicHistory = request.body;
 
-    const curriculum = await this.findCurriculum(curriculumSigaaId);
-    const components = await this.findComponents(componentIds);
-
-    await this.generateGraph(curriculum, components);
+    await this.generateGraph();
+    return Object.fromEntries(this.graph);
   }
 
   async findCurriculum(sigaaId: string) {
@@ -44,39 +37,56 @@ class RecommendationController {
     return await this.componentRepository.findBy({ sigaaId: In(sigaaIds) });
   }
 
-  async generateGraph(curriculum: Curriculum, components: Component[]) {
+  async generateGraph() {
+    const {
+      components: { remaining },
+    } = this.academicHistory;
+
+    const components = await this.findComponents(remaining);
+
     this.initializeGraph();
-    await this.handleRequisites(curriculum, components);
+    await this.handleRequisites(components);
   }
 
   initializeGraph() {
     this.graph = new Map<Component['sigaaId'], Component['sigaaId'][]>();
   }
 
-  async handleRequisites(curriculum: Curriculum, components: Component[]) {
-    for (const component of components) {
-      const sigaaIdOptions = requisites.options(component.prerequisites);
+  async handleRequisites(components: Component[]) {
+    for (const { sigaaId, prerequisites } of components) {
+      const remainingOptions = this.filterCompletedPrerequisites(prerequisites);
 
-      if (sigaaIdOptions.length === 0) {
-        this.updateGraph(component.sigaaId);
+      if (remainingOptions.length === 0) {
+        this.updateGraph(sigaaId);
         continue;
       }
 
-      if (sigaaIdOptions.length === 1) {
-        this.updateGraph(component.sigaaId, sigaaIdOptions[0]);
+      if (remainingOptions.length === 1) {
+        this.updateGraph(sigaaId, remainingOptions[0]);
         continue;
       }
 
-      const options = await this.fetchParsedOptionComponents(sigaaIdOptions);
-      const prerequisites = await this.evaluateOptions(curriculum, options);
+      const options = await this.fetchParsedOptionComponents(remainingOptions);
+      const choosedOption = await this.evaluateOptions(options);
 
       this.updateGraph(
-        component.sigaaId,
-        prerequisites.map(({ sigaaId }) => sigaaId),
+        sigaaId,
+        choosedOption.map(({ sigaaId }) => sigaaId),
       );
 
-      await this.handleRequisites(curriculum, prerequisites);
+      await this.handleRequisites(choosedOption);
     }
+  }
+
+  filterCompletedPrerequisites(prerequisites: RequisitesExpression) {
+    const optionSigaaIds = requisites.options(prerequisites);
+
+    return optionSigaaIds.map((option) =>
+      option.filter(
+        (component) =>
+          !this.academicHistory.components.completed.includes(component),
+      ),
+    );
   }
 
   async fetchParsedOptionComponents(options: Component['sigaaId'][][]) {
@@ -85,25 +95,20 @@ class RecommendationController {
     );
   }
 
-  async evaluateOptions(curriculum: Curriculum, options: Component[][]) {
+  async evaluateOptions(options: Component[][]) {
     return options.reduce(async (bestOptionPromise, currentOption) => {
       const bestOption = await bestOptionPromise;
 
-      const bestProportion = await this.evaluateOption(curriculum, bestOption);
-      const currentProportion = await this.evaluateOption(
-        curriculum,
-        currentOption,
-      );
+      const bestProportion = await this.evaluateOption(bestOption);
+      const currentProportion = await this.evaluateOption(currentOption);
 
       return currentProportion > bestProportion ? currentOption : bestOption;
     }, Promise.resolve(options[0]));
   }
 
-  async evaluateOption(curriculum: Curriculum, option: Component[]) {
+  async evaluateOption(option: Component[]) {
     const mandatoryStatuses = await Promise.all(
-      option.map(({ sigaaId }) =>
-        this.isComponentMandatory(curriculum, sigaaId),
-      ),
+      option.map(({ sigaaId }) => this.isComponentMandatory(sigaaId)),
     );
 
     const mandatoryComponents = option.filter(
@@ -113,14 +118,9 @@ class RecommendationController {
     return mandatoryComponents.length / option.length;
   }
 
-  async isComponentMandatory(
-    curriculum: Curriculum,
-    componentSigaaId: Component['sigaaId'],
-  ) {
-    const curriculumComponent = await this.getCurriculumComponent(
-      curriculum,
-      componentSigaaId,
-    );
+  async isComponentMandatory(componentSigaaId: Component['sigaaId']) {
+    const curriculumComponent =
+      await this.getCurriculumComponent(componentSigaaId);
 
     if (!curriculumComponent) {
       return false;
@@ -130,9 +130,11 @@ class RecommendationController {
   }
 
   async getCurriculumComponent(
-    curriculum: Curriculum,
     componentSigaaId: Component['sigaaId'],
   ): Promise<CurriculumComponent | null> {
+    const { curriculumSigaaId } = this.academicHistory;
+    const curriculum = await this.findCurriculum(curriculumSigaaId);
+
     try {
       return await this.currCompRepository.findOneByOrFail({
         curriculum,
@@ -147,18 +149,23 @@ class RecommendationController {
     componentSigaaId: Component['sigaaId'],
     prerequisiteSigaaIds?: Component['sigaaId'][],
   ) {
-    if (!prerequisiteSigaaIds || prerequisiteSigaaIds.length === 0) {
-      this.graph.set('START', [
-        ...(this.graph.get('START') ?? []),
-        componentSigaaId,
-      ]);
-    } else {
-      for (const prerequisiteSigaaId of prerequisiteSigaaIds) {
-        this.graph.set(prerequisiteSigaaId, [
-          ...(this.graph.get(prerequisiteSigaaId) ?? []),
-          componentSigaaId,
-        ]);
+    const addComponentToGraph = (
+      key: string,
+      componentId: Component['sigaaId'],
+    ) => {
+      const existingComponents = new Set(this.graph.get(key) ?? []);
+      if (!existingComponents.has(componentId)) {
+        existingComponents.add(componentId);
+        this.graph.set(key, Array.from(existingComponents));
       }
+    };
+
+    if (!prerequisiteSigaaIds || prerequisiteSigaaIds.length === 0) {
+      addComponentToGraph('START', componentSigaaId);
+    } else {
+      prerequisiteSigaaIds.forEach((prerequisiteSigaaId) => {
+        addComponentToGraph(prerequisiteSigaaId, componentSigaaId);
+      });
     }
   }
 }
