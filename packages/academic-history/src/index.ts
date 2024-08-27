@@ -130,6 +130,18 @@ function handleCompletedComponentRow(row: string[]) {
   academicHistory.components.completed.push(componentSigaaId);
 }
 
+function handleEquivalentComponentRow(row: string[]) {
+  const isEquivalentComponentRow = row[0].match(/Cumpriu [A-Z]+\d+/);
+
+  if (!isEquivalentComponentRow) {
+    return;
+  }
+
+  const componentSigaaId = row[0].split(' ')[1];
+
+  academicHistory.components.completed.push(componentSigaaId);
+}
+
 function handleRemainingComponentRow(row: string[]) {
   const isLastColumnWorkload = row.at(-1)?.match(/\d+ h$/);
   const hasRowLength = row.length === 3 || row.length === 4;
@@ -153,10 +165,12 @@ export function extractAcademicHistory(filePath: string) {
       }
 
       rows.forEach((row) => {
+        console.log(row);
         handleProgramRow(row);
         handleCurriculumRow(row);
         handleWorkloadRow(row);
         handleCompletedComponentRow(row);
+        handleEquivalentComponentRow(row);
         handleRemainingComponentRow(row);
       });
 
