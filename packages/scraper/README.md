@@ -4,6 +4,22 @@
 
 O **scraper** é projetado para coletar dados do SIGAA (com o Puppeteer) e armazená-los no banco de dados.
 
+## Configuração do ambiente de desenvolvimento
+
+1. Assegure-se de que a API e o banco de dados estejam rodando.
+
+2. Defina as variáveis de ambiente.
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Inicie o processo de scraping.
+
+   ```bash
+   yarn start
+   ```
+
 ## Diretórios
 
 - **config**: Contém as configurações;
