@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "29f54ab0-be5f-4b8b-a5d1-4a0d0744d44c",
+		"name": "UnB Ágil",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13129417"
+	},
+	"item": [
+		{
+			"name": "Extract academic history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"academic-history\", pm.response.json());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "postman-cloud:///1efd13ee-c701-4280-9d5f-3dc20639d1bb"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{API_URL}}/academic-history",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"academic-history"
+					],
+					"query": [
+						{
+							"key": "file",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get recommendation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const academicHistory = pm.environment.get(\"academic-history\");",
+							"",
+							"const requestBody = {",
+							"    curriculumSigaaId: academicHistory.curriculumSigaaId,",
+							"    components: {",
+							"        completed: academicHistory.components.completed,",
+							"        remaining: academicHistory.components.remaining",
+							"    }",
+							"};",
+							"",
+							"pm.variables.set(\"requestBody\", JSON.stringify(requestBody));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{requestBody}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/recommendation",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"recommendation"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -165,7 +165,6 @@ export function extractAcademicHistory(filePath: string) {
       }
 
       rows.forEach((row) => {
-        console.log(row);
         handleProgramRow(row);
         handleCurriculumRow(row);
         handleWorkloadRow(row);

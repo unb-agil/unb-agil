@@ -1,0 +1,21 @@
+{
+	"id": "d29b2b94-f69a-481f-b763-e61488816409",
+	"name": "UnB Ágil",
+	"values": [
+		{
+			"key": "academic-history",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "API_URL",
+			"value": "http://localhost:3000",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-01-13T00:38:56.036Z",
+	"_postman_exported_using": "Postman/11.23.3"
+}
