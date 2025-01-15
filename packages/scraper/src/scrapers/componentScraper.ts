@@ -72,14 +72,20 @@ class ComponentScraper implements BaseScraper {
       await this.extractAttribute(componentPage, 'Responsável')
     ).split(' - ')[0];
 
+    const totalWorkload = await this.extractWorkload(
+      componentPage,
+      'Total de Carga Horária do Componente',
+    );
+
     const department = await new DepartmentService().get({
       title: departmentTitle,
     });
 
-    const component = {
+    const component: Component = {
       sigaaId,
       title,
       type: this.parseComponentType(type),
+      totalWorkload,
       prerequisites: requisites.parseRaw(rawPre),
       corequisites: requisites.parseRaw(rawCo),
       equivalences: requisites.parseRaw(rawEq),
@@ -96,6 +102,18 @@ class ComponentScraper implements BaseScraper {
       `::-p-xpath(${xpath})`,
       (el) => (el as HTMLTableCellElement).innerText,
     );
+  }
+
+  // //td[contains(., 'Total de Carga Horária do Componente')]/following-sibling::td[1]
+  static async extractWorkload(page: Page, title: string): Promise<number> {
+    const xpath = `//td[contains(., '${title}')]/following-sibling::td[1]`;
+
+    const rawWorkload = await page.$eval(
+      `::-p-xpath(${xpath})`,
+      (el) => (el as HTMLTableCellElement).innerText,
+    );
+
+    return parseInt(rawWorkload, 10);
   }
 
   static parseComponentType(type: string) {

@@ -21,6 +21,9 @@ class Component {
   @Column({ type: 'enum', enum: ComponentType, nullable: true })
   type: ComponentType;
 
+  @Column({ type: 'int', nullable: true })
+  totalWorkload: number;
+
   @Column({ type: 'simple-json', nullable: true })
   prerequisites: RequisitesExpression;
 

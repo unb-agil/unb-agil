@@ -25,6 +25,7 @@ export interface Component {
   sigaaId: string;
   title: string;
   type: ComponentType;
+  totalWorkload: number;
   departmentSigaaId: number;
   prerequisites: RequisitesExpression;
   corequisites: RequisitesExpression;

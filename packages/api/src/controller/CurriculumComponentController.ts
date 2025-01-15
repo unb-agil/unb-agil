@@ -26,14 +26,14 @@ class CurriculumComponentController {
       curriculumComponent.component = component;
 
       const existingCurriculumComponent = await this.repository.findOneBy({
-        curriculum,
-        component,
+        curriculum: { sigaaId: curriculum.sigaaId },
+        component: { sigaaId: component.sigaaId },
       });
 
       if (existingCurriculumComponent) {
         existingCurriculumComponent.type = curriculumComponent.type;
-        existingCurriculumComponent.percentagePrequisite =
-          curriculumComponent.percentagePrequisite;
+        existingCurriculumComponent.percentagePrerequisite =
+          curriculumComponent.percentagePrerequisite;
 
         newCurriculumComponents.push(existingCurriculumComponent);
       } else {
