@@ -32,8 +32,8 @@ class CurriculumComponentController {
 
       if (existingCurriculumComponent) {
         existingCurriculumComponent.type = curriculumComponent.type;
-        existingCurriculumComponent.percentagePrerequisite =
-          curriculumComponent.percentagePrerequisite;
+        existingCurriculumComponent.recommendedPeriod =
+          curriculumComponent.recommendedPeriod;
 
         newCurriculumComponents.push(existingCurriculumComponent);
       } else {

@@ -23,7 +23,7 @@ class CurriculumComponent {
   type: CurriculumComponentType;
 
   @Column({ type: 'int', nullable: true })
-  percentagePrerequisite: number;
+  recommendedPeriod: number;
 
   @ManyToOne(() => Curriculum, (curriculum) => curriculum.curriculumComponent)
   curriculum: Curriculum;
