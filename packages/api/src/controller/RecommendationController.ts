@@ -29,7 +29,9 @@ class RecommendationController {
     await this.generateGraph();
     await this.generateRecommendation();
 
-    return this.recommendation;
+    // return this.recommendation;
+    // return only the components ids of recommendation
+    return this.recommendation.map((period) => period.map((c) => c.sigaaId));
   }
 
   async findCurriculum(sigaaId: string) {
@@ -51,11 +53,22 @@ class RecommendationController {
     await this.handleRequisites(components);
   }
 
-  initializeGraph() {
+  async generateRecommendation() {
+    const chains = this.countComponentChains();
+
+    while (this.graph.size > 0) {
+      const available = await this.getRootComponents();
+      const prioritized = await this.prioritizeComponents(available, chains);
+      this.insertComponents(prioritized);
+      this.removeInsertedComponentsFromGraph();
+    }
+  }
+
+  private initializeGraph() {
     this.graph = new Map<Component['sigaaId'], Component['sigaaId'][]>();
   }
 
-  async handleRequisites(components: Component[]) {
+  private async handleRequisites(components: Component[]) {
     for (const { sigaaId, prerequisites } of components) {
       const remainingOptions = this.filterCompletedPrerequisites(prerequisites);
 
@@ -81,7 +94,7 @@ class RecommendationController {
     }
   }
 
-  filterCompletedPrerequisites(prerequisites: RequisitesExpression) {
+  private filterCompletedPrerequisites(prerequisites: RequisitesExpression) {
     const optionSigaaIds = requisites.options(prerequisites);
 
     return optionSigaaIds.map((option) =>
@@ -92,13 +105,13 @@ class RecommendationController {
     );
   }
 
-  async fetchParsedOptionComponents(options: Component['sigaaId'][][]) {
+  private async fetchParsedOptionComponents(options: Component['sigaaId'][][]) {
     return await Promise.all(
       options.map(async (option) => await this.findComponents(option)),
     );
   }
 
-  async evaluateOptions(options: Component[][]) {
+  private async evaluateOptions(options: Component[][]) {
     return options.reduce(async (bestOptionPromise, currentOption) => {
       const bestOption = await bestOptionPromise;
 
@@ -109,7 +122,7 @@ class RecommendationController {
     }, Promise.resolve(options[0]));
   }
 
-  async evaluateOption(option: Component[]) {
+  private async evaluateOption(option: Component[]) {
     const mandatoryStatuses = await Promise.all(
       option.map(({ sigaaId }) => this.isComponentMandatory(sigaaId)),
     );
@@ -121,7 +134,7 @@ class RecommendationController {
     return mandatoryComponents.length / option.length;
   }
 
-  async isComponentMandatory(componentSigaaId: Component['sigaaId']) {
+  private async isComponentMandatory(componentSigaaId: Component['sigaaId']) {
     const curriculumComponent =
       await this.getCurriculumComponent(componentSigaaId);
 
@@ -132,7 +145,7 @@ class RecommendationController {
     return curriculumComponent.type === CurriculumComponentType.MANDATORY;
   }
 
-  async getCurriculumComponent(
+  private async getCurriculumComponent(
     componentSigaaId: Component['sigaaId'],
   ): Promise<CurriculumComponent | null> {
     const { curriculumSigaaId } = this.academicHistory;
@@ -148,7 +161,7 @@ class RecommendationController {
     }
   }
 
-  updateGraph(
+  private updateGraph(
     componentSigaaId: Component['sigaaId'],
     prerequisiteSigaaIds?: Component['sigaaId'][],
   ) {
@@ -170,81 +183,6 @@ class RecommendationController {
         addComponentToGraph(prerequisiteSigaaId, componentSigaaId);
       });
     }
-  }
-
-  async generateRecommendation() {
-    const chains = this.countComponentChains();
-
-    const available = await this.getRootComponents();
-    const prioritized = await this.prioritizeComponentsV2(available, chains);
-    this.insertComponents(prioritized);
-    // this.removeInsertedComponentsFromGraph(prioritized);
-  }
-
-  insertComponents(prioritized: Component[]) {
-    const MAX_WORKLOAD_BY_PERIOD = 270;
-
-    for (const component of prioritized) {
-      const periodIndex = this.recommendation.findIndex(
-        (period) =>
-          period.reduce((acc, c) => acc + c.totalWorkload, 0) +
-            component.totalWorkload <=
-          MAX_WORKLOAD_BY_PERIOD,
-      );
-
-      if (periodIndex !== -1) {
-        this.recommendation[periodIndex].push(component);
-      } else {
-        this.recommendation.push([component]);
-      }
-    }
-  }
-
-  private async prioritizeComponentsV2(
-    available: Component[],
-    chains: Map<Component['sigaaId'], number>,
-  ) {
-    const recommendedPeriods = new Map<Component['sigaaId'], number>();
-
-    await Promise.all(
-      available.map(async (component) => {
-        const curriculumComponent = await this.getCurriculumComponent(
-          component.sigaaId,
-        );
-
-        recommendedPeriods.set(
-          component.sigaaId,
-          curriculumComponent?.recommendedPeriod ?? 0,
-        );
-      }),
-    );
-
-    return available.sort((a, b) => {
-      const aChainCount = chains.get(a.sigaaId) ?? 0;
-      const bChainCount = chains.get(b.sigaaId) ?? 0;
-      const aRecommendedPeriod = recommendedPeriods.get(a.sigaaId) ?? Infinity;
-      const bRecommendedPeriod = recommendedPeriods.get(b.sigaaId) ?? Infinity;
-
-      if (aChainCount !== bChainCount) {
-        return bChainCount - aChainCount;
-      }
-
-      return aRecommendedPeriod - bRecommendedPeriod;
-    });
-  }
-
-  private async getRootComponents(): Promise<Component[]> {
-    const available = this.graph.get('ROOT') ?? [];
-
-    const components = await Promise.all(
-      available?.map(async (sigaaId) => {
-        const component = await this.componentRepository.findOneBy({ sigaaId });
-
-        return component;
-      }),
-    );
-
-    return components;
   }
 
   private countComponentChains(): Map<Component['sigaaId'], number> {
@@ -282,6 +220,116 @@ class RecommendationController {
     }
 
     return longestChainCache;
+  }
+  '';
+
+  private async getRootComponents(): Promise<Component[]> {
+    const available = this.graph.get('ROOT') ?? [];
+
+    const components = await Promise.all(
+      available?.map(async (sigaaId) => {
+        const component = await this.componentRepository.findOneBy({ sigaaId });
+
+        return component;
+      }),
+    );
+
+    return components;
+  }
+
+  private async prioritizeComponents(
+    available: Component[],
+    chains: Map<Component['sigaaId'], number>,
+  ) {
+    const recommendedPeriods = new Map<Component['sigaaId'], number>();
+
+    await Promise.all(
+      available.map(async (component) => {
+        const curriculumComponent = await this.getCurriculumComponent(
+          component.sigaaId,
+        );
+
+        recommendedPeriods.set(
+          component.sigaaId,
+          curriculumComponent?.recommendedPeriod ?? 0,
+        );
+      }),
+    );
+
+    return available.sort((a, b) => {
+      const aChainCount = chains.get(a.sigaaId) ?? 0;
+      const bChainCount = chains.get(b.sigaaId) ?? 0;
+      const aRecommendedPeriod = recommendedPeriods.get(a.sigaaId) ?? Infinity;
+      const bRecommendedPeriod = recommendedPeriods.get(b.sigaaId) ?? Infinity;
+
+      if (aChainCount !== bChainCount) {
+        return bChainCount - aChainCount;
+      }
+
+      return aRecommendedPeriod - bRecommendedPeriod;
+    });
+  }
+
+  private insertComponents(prioritized: Component[]) {
+    const MAX_WORKLOAD_BY_PERIOD = 1000;
+
+    for (const component of prioritized) {
+      const periodIndex = this.recommendation.findIndex(
+        (period) =>
+          period.reduce((acc, c) => acc + c.totalWorkload, 0) +
+            component.totalWorkload <=
+          MAX_WORKLOAD_BY_PERIOD,
+      );
+
+      if (periodIndex !== -1) {
+        this.recommendation[periodIndex].push(component);
+      } else {
+        this.recommendation.push([component]);
+      }
+    }
+  }
+
+  private removeInsertedComponentsFromGraph() {
+    // Remove root
+    const rootComponents = this.graph.get('ROOT');
+
+    if (!rootComponents) {
+      return;
+    }
+
+    this.graph.delete('ROOT');
+
+    // Get components that root components were blocking
+    const componentsBlockedByRoot = new Set<string>();
+
+    for (const rootComponent of rootComponents) {
+      const blockedComponents = this.graph.get(rootComponent);
+
+      if (!blockedComponents) {
+        continue;
+      }
+
+      blockedComponents.forEach((blockedComponent) =>
+        componentsBlockedByRoot.add(blockedComponent),
+      );
+    }
+
+    // Delete root components
+    rootComponents.forEach((root) => this.graph.delete(root));
+
+    const newBlockedComponents = new Set(
+      Array.from(this.graph.values()).flat(),
+    );
+
+    // Compare componentsBlockedByRoot with newBlockedComponents. Return the components that are not in newBlockedComponents
+    const unblockedComponents = Array.from(componentsBlockedByRoot).filter(
+      (component) => !newBlockedComponents.has(component),
+    );
+
+    // add unblocked components to the root
+    if (unblockedComponents.length > 0) {
+      this.graph.set('ROOT', unblockedComponents);
+    }
   }
 }
 
