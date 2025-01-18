@@ -15,8 +15,9 @@ type RecommendationRequest = Request<never, never, AcademicHistory>;
 type RequisitesGraph = Map<Component['sigaaId'], Component['sigaaId'][]>;
 
 class RecommendationController {
-  private graph: RequisitesGraph;
   private academicHistory: AcademicHistory;
+  private graph: RequisitesGraph;
+  private recommendation: Component[][] = [];
 
   private curriculumRepository = AppDataSource.getRepository(Curriculum);
   private currCompRepository = AppDataSource.getRepository(CurriculumComponent);
@@ -26,7 +27,9 @@ class RecommendationController {
     this.academicHistory = request.body;
 
     await this.generateGraph();
-    return Object.fromEntries(this.graph);
+    await this.generateRecommendation();
+
+    return this.recommendation;
   }
 
   async findCurriculum(sigaaId: string) {
@@ -161,12 +164,124 @@ class RecommendationController {
     };
 
     if (!prerequisiteSigaaIds || prerequisiteSigaaIds.length === 0) {
-      addComponentToGraph('START', componentSigaaId);
+      addComponentToGraph('ROOT', componentSigaaId);
     } else {
       prerequisiteSigaaIds.forEach((prerequisiteSigaaId) => {
         addComponentToGraph(prerequisiteSigaaId, componentSigaaId);
       });
     }
+  }
+
+  async generateRecommendation() {
+    const chains = this.countComponentChains();
+
+    const available = await this.getRootComponents();
+    const prioritized = await this.prioritizeComponentsV2(available, chains);
+    this.insertComponents(prioritized);
+    // this.removeInsertedComponentsFromGraph(prioritized);
+  }
+
+  insertComponents(prioritized: Component[]) {
+    const MAX_WORKLOAD_BY_PERIOD = 270;
+
+    for (const component of prioritized) {
+      const periodIndex = this.recommendation.findIndex(
+        (period) =>
+          period.reduce((acc, c) => acc + c.totalWorkload, 0) +
+            component.totalWorkload <=
+          MAX_WORKLOAD_BY_PERIOD,
+      );
+
+      if (periodIndex !== -1) {
+        this.recommendation[periodIndex].push(component);
+      } else {
+        this.recommendation.push([component]);
+      }
+    }
+  }
+
+  private async prioritizeComponentsV2(
+    available: Component[],
+    chains: Map<Component['sigaaId'], number>,
+  ) {
+    const recommendedPeriods = new Map<Component['sigaaId'], number>();
+
+    await Promise.all(
+      available.map(async (component) => {
+        const curriculumComponent = await this.getCurriculumComponent(
+          component.sigaaId,
+        );
+
+        recommendedPeriods.set(
+          component.sigaaId,
+          curriculumComponent?.recommendedPeriod ?? 0,
+        );
+      }),
+    );
+
+    return available.sort((a, b) => {
+      const aChainCount = chains.get(a.sigaaId) ?? 0;
+      const bChainCount = chains.get(b.sigaaId) ?? 0;
+      const aRecommendedPeriod = recommendedPeriods.get(a.sigaaId) ?? Infinity;
+      const bRecommendedPeriod = recommendedPeriods.get(b.sigaaId) ?? Infinity;
+
+      if (aChainCount !== bChainCount) {
+        return bChainCount - aChainCount;
+      }
+
+      return aRecommendedPeriod - bRecommendedPeriod;
+    });
+  }
+
+  private async getRootComponents(): Promise<Component[]> {
+    const available = this.graph.get('ROOT') ?? [];
+
+    const components = await Promise.all(
+      available?.map(async (sigaaId) => {
+        const component = await this.componentRepository.findOneBy({ sigaaId });
+
+        return component;
+      }),
+    );
+
+    return components;
+  }
+
+  private countComponentChains(): Map<Component['sigaaId'], number> {
+    const longestChainCache = new Map<Component['sigaaId'], number>();
+
+    const calculateLongestChain = (sigaaId: Component['sigaaId']): number => {
+      if (longestChainCache.has(sigaaId)) {
+        const cachedValue = longestChainCache.get(sigaaId);
+
+        if (cachedValue !== undefined) {
+          return cachedValue;
+        }
+      }
+
+      const prerequisites = this.graph.get(sigaaId) || [];
+      if (prerequisites.length === 0) {
+        longestChainCache.set(sigaaId, 1);
+        return 1;
+      }
+
+      const longestChain =
+        Math.max(
+          ...prerequisites.map((prerequisite) =>
+            calculateLongestChain(prerequisite),
+          ),
+        ) + 1;
+
+      longestChainCache.set(sigaaId, longestChain);
+
+      return longestChain;
+    };
+
+    for (const sigaaId of this.graph.keys()) {
+      calculateLongestChain(sigaaId);
+    }
+
+    return longestChainCache;
   }
 }
 
