@@ -1,96 +1,70 @@
+import { In } from 'typeorm';
 import Component from '@/entity/Component';
-import RequisitesGraph from './graph';
-import CurriculumComponent from '@/entity/CurriculumComponent';
-import { AppDataSource } from '@/data-source';
 import Curriculum from '@/entity/Curriculum';
+import ComponentRepository from '@/repositories/ComponentRepository';
+import CurriculumComponentRepository from '@/repositories/CurriculumComponentRepository';
+import RequisitesGraph from './graph';
 
 export default class Recommendation {
+  private curriculum: Curriculum;
+  private maxWorkloadByPeriod: number;
   private recommendation: Component[][] = [];
+  private pathLengths = new Map<Component['sigaaId'], number>();
 
-  private curriculumRepository = AppDataSource.getRepository(Curriculum);
-  private currCompRepository = AppDataSource.getRepository(CurriculumComponent);
+  constructor(curriculum: Curriculum, maxWorkloadByPeriod: number) {
+    this.curriculum = curriculum;
+    this.maxWorkloadByPeriod = maxWorkloadByPeriod;
+  }
 
-  public async generate(curriculumSigaaId: string, graph: RequisitesGraph) {
-    const pathLengths = graph.getPathLengths();
+  public async generate(graph: RequisitesGraph) {
+    this.pathLengths = graph.getPathLengths();
 
     while (graph.size > 0) {
-      const available = await graph.getRootComponents();
+      const available = await ComponentRepository.findBy({
+        sigaaId: In([graph.root]),
+      });
 
-      const prioritized = await this.prioritizeComponents(
-        curriculumSigaaId,
-        available,
-        pathLengths,
-      );
+      const prioritized = await this.prioritize(available);
 
-      this.insertComponents(prioritized);
+      this.insert(prioritized);
       graph.removeInsertedComponentsFromGraph();
     }
   }
 
-  async findCurriculum(sigaaId: string) {
-    return await this.curriculumRepository.findOneBy({ sigaaId });
-  }
+  private async prioritize(available: Component[]) {
+    const curriculumComponents = await CurriculumComponentRepository.findBy({
+      curriculum: this.curriculum,
+      componentSigaaId: In(available.map((component) => component.sigaaId)),
+    });
 
-  private async getCurriculumComponent(
-    curriculumSigaaId: string,
-    componentSigaaId: Component['sigaaId'],
-  ): Promise<CurriculumComponent | null> {
-    const curriculum = await this.findCurriculum(curriculumSigaaId);
-
-    try {
-      return await this.currCompRepository.findOneByOrFail({
-        curriculum,
-        componentSigaaId,
-      });
-    } catch {
-      return null;
-    }
-  }
-
-  private async prioritizeComponents(
-    curriculumSigaaId: string,
-    available: Component[],
-    chains: Map<Component['sigaaId'], number>,
-  ) {
-    const recommendedPeriods = new Map<Component['sigaaId'], number>();
-
-    await Promise.all(
-      available.map(async (component) => {
-        const curriculumComponent = await this.getCurriculumComponent(
-          curriculumSigaaId,
-          component.sigaaId,
-        );
-
-        recommendedPeriods.set(
-          component.sigaaId,
-          curriculumComponent?.recommendedPeriod ?? 0,
-        );
-      }),
+    const recommendedPeriods = new Map(
+      curriculumComponents.map((curriculumComponent) => [
+        curriculumComponent.componentSigaaId,
+        curriculumComponent.recommendedPeriod,
+      ]),
     );
 
     return available.sort((a, b) => {
-      const aChainCount = chains.get(a.sigaaId) ?? 0;
-      const bChainCount = chains.get(b.sigaaId) ?? 0;
+      const aPathLength = this.pathLengths.get(a.sigaaId) ?? 0;
+      const bPathLength = this.pathLengths.get(b.sigaaId) ?? 0;
       const aRecommendedPeriod = recommendedPeriods.get(a.sigaaId) ?? Infinity;
       const bRecommendedPeriod = recommendedPeriods.get(b.sigaaId) ?? Infinity;
 
-      if (aChainCount !== bChainCount) {
-        return bChainCount - aChainCount;
+      if (aPathLength !== bPathLength) {
+        return bPathLength - aPathLength;
       }
 
       return aRecommendedPeriod - bRecommendedPeriod;
     });
   }
 
-  private insertComponents(prioritized: Component[]) {
-    const MAX_WORKLOAD_BY_PERIOD = 1000;
-
+  private insert(prioritized: Component[]) {
     for (const component of prioritized) {
       const periodIndex = this.recommendation.findIndex(
         (period) =>
           period.reduce((acc, c) => acc + c.totalWorkload, 0) +
             component.totalWorkload <=
-          MAX_WORKLOAD_BY_PERIOD,
+          this.maxWorkloadByPeriod,
       );
 
       if (periodIndex !== -1) {

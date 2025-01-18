@@ -1,29 +1,32 @@
 import { In } from 'typeorm';
-
 import requisites, { RequisitesExpression } from '@unb-agil/requisites-parser';
-import { AcademicHistory } from '@unb-agil/academic-history';
-
-import { AppDataSource } from '@/data-source';
-
 import Component from '@/entity/Component';
 import Curriculum from '@/entity/Curriculum';
-import CurriculumComponent, {
-  CurriculumComponentType,
-} from '@/entity/CurriculumComponent';
+import { CurriculumComponentType } from '@/entity/CurriculumComponent';
+import CurriculumComponentRepository from '@/repositories/CurriculumComponentRepository';
+import ComponentRepository from '@/repositories/ComponentRepository';
 
 export default class RequisitesGraph {
-  private academicHistory: AcademicHistory;
+  private curriculum: Curriculum;
+  private completedComponentIds: Component['sigaaId'][];
+  private remainingComponentIds: Component['sigaaId'][];
   private graph = new Map<Component['sigaaId'], Component['sigaaId'][]>();
 
-  private componentRepository = AppDataSource.getRepository(Component);
-  private curriculumRepository = AppDataSource.getRepository(Curriculum);
-  private currCompRepository = AppDataSource.getRepository(CurriculumComponent);
+  constructor(
+    curriculum: Curriculum,
+    completedComponentsIds: Component['sigaaId'][],
+    remainingComponentsIds: Component['sigaaId'][],
+  ) {
+    this.curriculum = curriculum;
+    this.completedComponentIds = completedComponentsIds;
+    this.remainingComponentIds = remainingComponentsIds;
+  }
 
-  async generate(academicHistory: AcademicHistory) {
-    this.academicHistory = academicHistory;
-    const components = await this.findComponents(
-      this.academicHistory.components.remaining,
-    );
+  async generate() {
+    const components = await ComponentRepository.findBy({
+      sigaaId: In(this.remainingComponentIds),
+    });
+
     this.initializeGraph();
     await this.processComponents(components);
   }
@@ -57,6 +60,13 @@ export default class RequisitesGraph {
     }
   }
 
+  private filterCompletedPrerequisites(prerequisites: RequisitesExpression) {
+    const optionSigaaIds = requisites.options(prerequisites);
+    return optionSigaaIds.map((option) =>
+      option.filter((id) => !this.completedComponentIds.includes(id)),
+    );
+  }
+
   private async chooseBestOption(options: Component['sigaaId'][][]) {
     const parsedOptions = await this.fetchParsedOptionComponents(options);
     return this.evaluateOptions(parsedOptions);
@@ -88,41 +98,14 @@ export default class RequisitesGraph {
   }
 
   private async isComponentMandatory(componentSigaaId: Component['sigaaId']) {
-    const curriculumComponent =
-      await this.getCurriculumComponent(componentSigaaId);
+    const curriculumComponent = await CurriculumComponentRepository.findOneBy({
+      curriculum: this.curriculum,
+      componentSigaaId,
+    });
+
     return curriculumComponent
       ? curriculumComponent.type === CurriculumComponentType.MANDATORY
       : false;
-  }
-
-  private async getCurriculumComponent(
-    componentSigaaId: Component['sigaaId'],
-  ): Promise<CurriculumComponent | null> {
-    const { curriculumSigaaId } = this.academicHistory;
-    const curriculum = await this.findCurriculum(curriculumSigaaId);
-
-    try {
-      return await this.currCompRepository.findOneByOrFail({
-        curriculum,
-        componentSigaaId,
-      });
-    } catch {
-      return null;
-    }
-  }
-
-  private async findCurriculum(sigaaId: string) {
-    return await this.curriculumRepository.findOneBy({ sigaaId });
-  }
-
-  private filterCompletedPrerequisites(prerequisites: RequisitesExpression) {
-    const optionSigaaIds = requisites.options(prerequisites);
-    return optionSigaaIds.map((option) =>
-      option.filter(
-        (component) =>
-          !this.academicHistory.components.completed.includes(component),
-      ),
-    );
   }
 
   private updateGraph(
@@ -150,7 +133,7 @@ export default class RequisitesGraph {
   }
 
   private async findComponents(sigaaIds: string[]) {
-    return await this.componentRepository.findBy({ sigaaId: In(sigaaIds) });
+    return await ComponentRepository.findBy({ sigaaId: In(sigaaIds) });
   }
 
   getPathLengths(): Map<Component['sigaaId'], number> {
@@ -159,7 +142,6 @@ export default class RequisitesGraph {
     const calculateLongestChain = (sigaaId: Component['sigaaId']): number => {
       if (longestChainCache.has(sigaaId)) {
         const cachedValue = longestChainCache.get(sigaaId);
-
         if (cachedValue !== undefined) {
           return cachedValue;
         }
@@ -179,7 +161,6 @@ export default class RequisitesGraph {
         ) + 1;
 
       longestChainCache.set(sigaaId, longestChain);
-
       return longestChain;
     };
 
@@ -190,58 +171,50 @@ export default class RequisitesGraph {
     return longestChainCache;
   }
 
+  get root() {
+    return this.graph.get('ROOT');
+  }
+
   async getRootComponents(): Promise<Component[]> {
     const available = this.graph.get('ROOT') ?? [];
 
     const components = await Promise.all(
-      available?.map(async (sigaaId) => {
-        const component = await this.componentRepository.findOneBy({ sigaaId });
-
-        return component;
-      }),
+      available?.map(
+        async (sigaaId) => await ComponentRepository.findOneBy({ sigaaId }),
+      ),
     );
 
     return components;
   }
 
   removeInsertedComponentsFromGraph() {
-    // Remove root
     const rootComponents = this.graph.get('ROOT');
-
     if (!rootComponents) {
       return;
     }
 
     this.graph.delete('ROOT');
-
-    // Get components that root components were blocking
     const componentsBlockedByRoot = new Set<string>();
 
     for (const rootComponent of rootComponents) {
       const blockedComponents = this.graph.get(rootComponent);
-
       if (!blockedComponents) {
         continue;
       }
-
       blockedComponents.forEach((blockedComponent) =>
         componentsBlockedByRoot.add(blockedComponent),
       );
     }
 
-    // Delete root components
     rootComponents.forEach((root) => this.graph.delete(root));
-
     const newBlockedComponents = new Set(
       Array.from(this.graph.values()).flat(),
     );
 
-    // Compare componentsBlockedByRoot with newBlockedComponents. Return the components that are not in newBlockedComponents
     const unblockedComponents = Array.from(componentsBlockedByRoot).filter(
       (component) => !newBlockedComponents.has(component),
     );
 
-    // add unblocked components to the root
     if (unblockedComponents.length > 0) {
       this.graph.set('ROOT', unblockedComponents);
     }
