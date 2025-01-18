@@ -113,7 +113,7 @@ function handleWorkloadRow(row: string[]) {
 }
 
 function handleCompletedComponentRow(row: string[]) {
-  const isCompletedComponentRow = row.at(-1) === 'APR';
+  const isCompletedComponentRow = row.at(-1) === 'APR' || row.at(-1) === 'DISP';
 
   if (!isCompletedComponentRow) {
     return;
