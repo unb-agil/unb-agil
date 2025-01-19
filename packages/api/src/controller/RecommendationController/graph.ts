@@ -22,13 +22,59 @@ export default class RequisitesGraph {
     this.remainingComponentIds = remainingComponentsIds;
   }
 
-  async generate() {
+  public async generate() {
     const components = await ComponentRepository.findBy({
       sigaaId: In(this.remainingComponentIds),
     });
 
     this.initializeGraph();
     await this.processComponents(components);
+  }
+
+  public getPathLengths(): Map<Component['sigaaId'], number> {
+    const longestChainCache = new Map<Component['sigaaId'], number>();
+
+    const calculateLongestChain = (sigaaId: Component['sigaaId']): number => {
+      if (longestChainCache.has(sigaaId)) {
+        const cachedValue = longestChainCache.get(sigaaId);
+        if (cachedValue !== undefined) {
+          return cachedValue;
+        }
+      }
+
+      const prerequisites = this.graph.get(sigaaId) || [];
+      if (prerequisites.length === 0) {
+        longestChainCache.set(sigaaId, 1);
+        return 1;
+      }
+
+      const longestChain =
+        Math.max(
+          ...prerequisites.map((prerequisite) =>
+            calculateLongestChain(prerequisite),
+          ),
+        ) + 1;
+
+      longestChainCache.set(sigaaId, longestChain);
+      return longestChain;
+    };
+
+    for (const sigaaId of this.graph.keys()) {
+      calculateLongestChain(sigaaId);
+    }
+
+    return longestChainCache;
+  }
+
+  public getPrerequisites(componentSigaaId: Component['sigaaId']) {
+    return Array.from(this.graph.entries())
+      .filter((entry) => entry[1].includes(componentSigaaId))
+      .map(([key]) => key)
+      .filter((key) => key !== 'ROOT');
+  }
+
+  public getAll() {
+    return Array.from(this.graph.values()).flat();
   }
 
   private initializeGraph() {
@@ -134,93 +180,5 @@ export default class RequisitesGraph {
 
   private async findComponents(sigaaIds: string[]) {
     return await ComponentRepository.findBy({ sigaaId: In(sigaaIds) });
-  }
-
-  getPathLengths(): Map<Component['sigaaId'], number> {
-    const longestChainCache = new Map<Component['sigaaId'], number>();
-
-    const calculateLongestChain = (sigaaId: Component['sigaaId']): number => {
-      if (longestChainCache.has(sigaaId)) {
-        const cachedValue = longestChainCache.get(sigaaId);
-        if (cachedValue !== undefined) {
-          return cachedValue;
-        }
-      }
-
-      const prerequisites = this.graph.get(sigaaId) || [];
-      if (prerequisites.length === 0) {
-        longestChainCache.set(sigaaId, 1);
-        return 1;
-      }
-
-      const longestChain =
-        Math.max(
-          ...prerequisites.map((prerequisite) =>
-            calculateLongestChain(prerequisite),
-          ),
-        ) + 1;
-
-      longestChainCache.set(sigaaId, longestChain);
-      return longestChain;
-    };
-
-    for (const sigaaId of this.graph.keys()) {
-      calculateLongestChain(sigaaId);
-    }
-
-    return longestChainCache;
-  }
-
-  get root() {
-    return this.graph.get('ROOT');
-  }
-
-  async getRootComponents(): Promise<Component[]> {
-    const available = this.graph.get('ROOT') ?? [];
-
-    const components = await Promise.all(
-      available?.map(
-        async (sigaaId) => await ComponentRepository.findOneBy({ sigaaId }),
-      ),
-    );
-
-    return components;
-  }
-
-  removeInsertedComponentsFromGraph() {
-    const rootComponents = this.graph.get('ROOT');
-    if (!rootComponents) {
-      return;
-    }
-
-    this.graph.delete('ROOT');
-    const componentsBlockedByRoot = new Set<string>();
-
-    for (const rootComponent of rootComponents) {
-      const blockedComponents = this.graph.get(rootComponent);
-      if (!blockedComponents) {
-        continue;
-      }
-      blockedComponents.forEach((blockedComponent) =>
-        componentsBlockedByRoot.add(blockedComponent),
-      );
-    }
-
-    rootComponents.forEach((root) => this.graph.delete(root));
-    const newBlockedComponents = new Set(
-      Array.from(this.graph.values()).flat(),
-    );
-
-    const unblockedComponents = Array.from(componentsBlockedByRoot).filter(
-      (component) => !newBlockedComponents.has(component),
-    );
-
-    if (unblockedComponents.length > 0) {
-      this.graph.set('ROOT', unblockedComponents);
-    }
-  }
-
-  get size() {
-    return this.graph.size;
   }
 }

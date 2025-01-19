@@ -5,36 +5,46 @@ import ComponentRepository from '@/repositories/ComponentRepository';
 import CurriculumComponentRepository from '@/repositories/CurriculumComponentRepository';
 import RequisitesGraph from './graph';
 
+interface RecommendationOptions {
+  maxWorkloadByPeriod: number;
+}
+
 export default class Recommendation {
+  public recommendation: Component[][] = [];
+
   private curriculum: Curriculum;
+  private graph: RequisitesGraph;
   private maxWorkloadByPeriod: number;
-  private recommendation: Component[][] = [];
   private pathLengths = new Map<Component['sigaaId'], number>();
 
-  constructor(curriculum: Curriculum, maxWorkloadByPeriod: number) {
+  constructor(
+    curriculum: Curriculum,
+    graph: RequisitesGraph,
+    options: RecommendationOptions,
+  ) {
     this.curriculum = curriculum;
-    this.maxWorkloadByPeriod = maxWorkloadByPeriod;
+    this.graph = graph;
+    this.maxWorkloadByPeriod = options.maxWorkloadByPeriod;
+
+    this.pathLengths = this.graph.getPathLengths();
   }
 
-  public async generate(graph: RequisitesGraph) {
-    this.pathLengths = graph.getPathLengths();
-
-    while (graph.size > 0) {
-      const available = await ComponentRepository.findBy({
-        sigaaId: In([graph.root]),
-      });
-
-      const prioritized = await this.prioritize(available);
-
-      this.insert(prioritized);
-      graph.removeInsertedComponentsFromGraph();
-    }
+  public async generate() {
+    const components = await this.getPrioritizedComponents();
+    components.forEach((component) => this.insert(component));
   }
 
-  private async prioritize(available: Component[]) {
+  private async getRecommendationComponents() {
+    return ComponentRepository.findBy({ sigaaId: In(this.graph.getAll()) });
+  }
+
+  private async getPrioritizedComponents() {
+    const components = await this.getRecommendationComponents();
+    const sigaaIds = components.map((component) => component.sigaaId);
+
     const curriculumComponents = await CurriculumComponentRepository.findBy({
       curriculum: this.curriculum,
-      componentSigaaId: In(available.map((component) => component.sigaaId)),
+      componentSigaaId: In(sigaaIds),
     });
 
     const recommendedPeriods = new Map(
@@ -44,7 +54,7 @@ export default class Recommendation {
       ]),
     );
 
-    return available.sort((a, b) => {
+    return components.sort((a, b) => {
       const aPathLength = this.pathLengths.get(a.sigaaId) ?? 0;
       const bPathLength = this.pathLengths.get(b.sigaaId) ?? 0;
       const aRecommendedPeriod = recommendedPeriods.get(a.sigaaId) ?? Infinity;
@@ -58,26 +68,35 @@ export default class Recommendation {
     });
   }
 
-  private insert(prioritized: Component[]) {
-    for (const component of prioritized) {
-      const periodIndex = this.recommendation.findIndex(
-        (period) =>
-          period.reduce((acc, c) => acc + c.totalWorkload, 0) +
-            component.totalWorkload <=
-          this.maxWorkloadByPeriod,
+  private getLatestRecommendedComponentIndex(
+    componentIds: Component['sigaaId'][],
+  ) {
+    return componentIds.reduce((acc, componentId) => {
+      const index = this.recommendation.findIndex((period) =>
+        period.some((c) => c.sigaaId === componentId),
       );
 
-      if (periodIndex !== -1) {
-        this.recommendation[periodIndex].push(component);
-      } else {
-        this.recommendation.push([component]);
-      }
-    }
+      return Math.max(acc, index);
+    }, -1);
   }
 
-  get ids() {
-    return this.recommendation.map((period) =>
-      period.map((component) => component.sigaaId),
-    );
+  private insert(component: Component) {
+    const prerequisites = this.graph.getPrerequisites(component.sigaaId);
+    const lastPrerequisiteIndex =
+      this.getLatestRecommendedComponentIndex(prerequisites);
+
+    const startPeriodIndex = lastPrerequisiteIndex + 1;
+
+    for (let i = startPeriodIndex; i < this.recommendation.length; i++) {
+      const period = this.recommendation[i];
+      const totalWorkload = period.reduce((acc, c) => acc + c.totalWorkload, 0);
+
+      if (totalWorkload + component.totalWorkload <= this.maxWorkloadByPeriod) {
+        period.push(component);
+        return;
+      }
+    }
+
+    this.recommendation.push([component]);
   }
 }

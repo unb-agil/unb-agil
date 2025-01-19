@@ -6,7 +6,7 @@ import Recommendation from './recommendation';
 
 type RecommendationRequest = Request<never, never, AcademicHistory>;
 
-const maxWorkloadByPeriod = 1000;
+const maxWorkloadByPeriod = Infinity;
 
 export default class RecommendationController {
   async recommend(request: RecommendationRequest) {
@@ -20,11 +20,12 @@ export default class RecommendationController {
     });
 
     const graph = new RequisitesGraph(curriculum, completed, remaining);
-    const recommendation = new Recommendation(curriculum, maxWorkloadByPeriod);
-
     await graph.generate();
-    await recommendation.generate(graph);
 
-    return recommendation.ids;
+    const options = { maxWorkloadByPeriod };
+    const recommendation = new Recommendation(curriculum, graph, options);
+    await recommendation.generate();
+
+    return recommendation.recommendation;
   }
 }
