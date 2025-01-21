@@ -9,7 +9,7 @@ type MainLayoutProps = Readonly<{
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <AcademicHistoryProvider>{children}</AcademicHistoryProvider>
     </Container>
   );

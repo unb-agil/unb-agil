@@ -1,9 +1,12 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { AcademicHistory } from '@unb-agil/academic-history';
+import { Component } from '@/models/entities';
 
 interface AcademicHistoryContextType {
   academicHistory: AcademicHistory | null;
+  recommendation: Component[][] | null;
   setAcademicHistory: (academicHistory: AcademicHistory | null) => void;
+  setRecommendation: (recommendation: Component[][] | null) => void;
 }
 
 const AcademicHistoryContext = createContext<
@@ -17,10 +20,18 @@ export const AcademicHistoryProvider = ({
 }) => {
   const [academicHistory, setAcademicHistory] =
     useState<AcademicHistory | null>(null);
+  const [recommendation, setRecommendation] = useState<Component[][] | null>(
+    null,
+  );
 
   return (
     <AcademicHistoryContext.Provider
-      value={{ academicHistory, setAcademicHistory }}
+      value={{
+        academicHistory,
+        recommendation,
+        setAcademicHistory,
+        setRecommendation,
+      }}
     >
       {children}
     </AcademicHistoryContext.Provider>
