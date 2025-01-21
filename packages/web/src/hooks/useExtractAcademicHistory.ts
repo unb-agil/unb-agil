@@ -16,23 +16,19 @@ export default function useExtractAcademicHistory() {
 
     fetch('http://localhost:3000/academic-history', {
       method: 'POST',
-      headers: {
-        'User-Agent': 'insomnia/10.3.0',
-      },
       body: formData,
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Failed to upload file');
+          throw new Error('Falha ao ler histórico acadêmico');
         }
+
         return response.json();
       })
       .then((data) => {
-        console.log('File uploaded successfully', data);
         setData(data);
       })
       .catch((error) => {
-        console.error('Error uploading file:', error);
         setError(error.message);
       })
       .finally(() => {

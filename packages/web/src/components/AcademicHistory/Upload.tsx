@@ -1,20 +1,23 @@
 'use client';
 
 import { ChangeEvent, useEffect, useRef } from 'react';
-import { Box, Button } from '@mui/material';
+import { Button } from '@mui/material';
+import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import useExtractAcademicHistory from '@/hooks/useExtractAcademicHistory';
+import AcademicHistoryContainer from '@/components/AcademicHistory/Container';
 
 export default function AcademicHistoryUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { extract, loading, data } = useExtractAcademicHistory();
+  const { setAcademicHistory } = useAcademicHistoryContext();
 
   useEffect(() => {
     if (!data) {
       return;
     }
 
-    console.log(data);
-  }, [data]);
+    setAcademicHistory(data);
+  }, [data, setAcademicHistory]);
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
@@ -31,16 +34,7 @@ export default function AcademicHistoryUpload() {
   };
 
   return (
-    <Box
-      height="300px"
-      border="2px dashed"
-      borderRadius="8px"
-      borderColor="primary.main"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-    >
+    <AcademicHistoryContainer>
       <input
         type="file"
         accept="application/pdf"
@@ -48,6 +42,7 @@ export default function AcademicHistoryUpload() {
         ref={fileInputRef}
         onChange={handleFileChange}
       />
+
       <Button
         variant="contained"
         onClick={handleButtonClick}
@@ -56,6 +51,6 @@ export default function AcademicHistoryUpload() {
       >
         Selecionar histórico
       </Button>
-    </Box>
+    </AcademicHistoryContainer>
   );
 }
