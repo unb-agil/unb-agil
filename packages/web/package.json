@@ -7,9 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier --write .",
-    "prepare": "husky",
-    "pre-commit": "lint-staged"
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -17,22 +15,20 @@
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.3.1",
     "@mui/material-nextjs": "^6.3.1",
-    "@mui/x-data-grid": "^7.23.6",
+    "@unb-agil/academic-history": "*",
     "next": "15.1.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@unb-agil/typescript-config": "*",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@unb-agil/typescript-config": "*",
     "eslint": "^9",
     "eslint-config-next": "15.1.4",
     "eslint-config-prettier": "^9.1.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.3.0",
     "prettier": "3.4.2",
     "typescript": "^5"
   }

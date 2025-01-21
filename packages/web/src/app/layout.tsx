@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { ThemeProvider } from '@mui/material';
+import { Container, ThemeProvider } from '@mui/material';
 import theme from '@/theme';
 import './globals.css';
 
@@ -26,7 +26,9 @@ export default function RootLayout({
     <html lang="pt">
       <body className={poppins.variable}>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <Container maxWidth="lg">{children}</Container>
+          </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
     </html>
