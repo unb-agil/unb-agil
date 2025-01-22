@@ -1,6 +1,6 @@
 'use client';
 
-import { Container } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import { AcademicHistoryProvider } from '@/context/AcademicHistoryContext';
 import AppBar from '@/components/AppBar';
 
@@ -10,12 +10,12 @@ type MainLayoutProps = Readonly<{
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <AppBar />
 
-      <Container maxWidth="lg">
+      <Container sx={{ height: '100%' }} maxWidth="lg">
         <AcademicHistoryProvider>{children}</AcademicHistoryProvider>
       </Container>
-    </>
+    </Box>
   );
 }

@@ -27,10 +27,22 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: '#547B73',
+      main: '#6256CA',
     },
     secondary: {
-      main: '#454545',
+      main: '#86D293',
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+      defaultProps: {
+        disableElevation: true,
+      },
     },
   },
 });

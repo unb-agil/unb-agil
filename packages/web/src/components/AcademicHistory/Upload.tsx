@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useEffect, useRef } from 'react';
 import { Button } from '@mui/material';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import useExtractAcademicHistory from '@/hooks/useExtractAcademicHistory';
 import AcademicHistoryContainer from '@/components/AcademicHistory/Container';
@@ -45,9 +46,11 @@ export default function AcademicHistoryUpload() {
 
       <Button
         variant="contained"
+        color="primary"
         onClick={handleButtonClick}
         disabled={loading}
         loading={loading}
+        startIcon={<UploadFileIcon />}
       >
         Selecionar histórico
       </Button>
