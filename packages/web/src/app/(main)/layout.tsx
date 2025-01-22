@@ -2,6 +2,7 @@
 
 import { Container } from '@mui/material';
 import { AcademicHistoryProvider } from '@/context/AcademicHistoryContext';
+import AppBar from '@/components/AppBar';
 
 type MainLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -9,8 +10,12 @@ type MainLayoutProps = Readonly<{
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <Container maxWidth="lg">
-      <AcademicHistoryProvider>{children}</AcademicHistoryProvider>
-    </Container>
+    <>
+      <AppBar />
+
+      <Container maxWidth="lg">
+        <AcademicHistoryProvider>{children}</AcademicHistoryProvider>
+      </Container>
+    </>
   );
 }
