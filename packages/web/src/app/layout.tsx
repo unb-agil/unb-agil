@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { Barlow_Condensed, Montserrat } from 'next/font/google';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { ThemeProvider } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import theme from '@/theme';
-import './globals.css';
 
 const barlowCondensed = Barlow_Condensed({
   weight: ['300', '400', '500', '700'],
@@ -33,7 +32,11 @@ export default function RootLayout({
     <html lang="pt">
       <body className={`${barlowCondensed.variable} ${montserrat.variable}`}>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+
+            {children}
+          </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
     </html>
