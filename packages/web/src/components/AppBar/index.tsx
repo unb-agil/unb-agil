@@ -6,7 +6,7 @@ export default function AppBar() {
     <MuiAppBar position="static" color="transparent" elevation={0}>
       <Container maxWidth="lg">
         <Toolbar disableGutters>
-          <Typography variant="h6">Fluxo Ágil</Typography>
+          <Typography variant="h4">UnB Ágil</Typography>
         </Toolbar>
       </Container>
     </MuiAppBar>
