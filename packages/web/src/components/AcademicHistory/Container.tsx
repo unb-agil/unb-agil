@@ -1,10 +1,14 @@
-import { Box } from '@mui/material';
+import { Box, Toolbar, Typography } from '@mui/material';
 
 interface AcademicHistoryContainerProps {
+  step: number;
+  totalSteps: number;
   children: React.ReactNode;
 }
 
 export default function AcademicHistoryContainer({
+  step,
+  totalSteps,
   children,
 }: AcademicHistoryContainerProps) {
   return (
@@ -13,13 +17,25 @@ export default function AcademicHistoryContainer({
       border="2px dashed"
       borderRadius="8px"
       borderColor="primary.main"
-      padding={3}
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
+      position="relative"
     >
-      {children}
+      <Toolbar variant="dense">
+        <Typography variant="body2" color="primary">
+          Passo {step} de {totalSteps}
+        </Typography>
+      </Toolbar>
+
+      <Box
+        height="100%"
+        padding={3}
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+      >
+        {children}
+      </Box>
     </Box>
   );
 }

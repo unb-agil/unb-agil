@@ -1,9 +1,11 @@
 'use client';
 
+import { Box } from '@mui/material';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import AcademicHistoryGrid from '@/components/AcademicHistory/Grid';
 import AcademicHistoryUpload from '@/components/AcademicHistory/Upload';
 import Recommendation from '@/components/Recommendation';
+import Hero from '@/components/Hero';
 
 export default function Home() {
   const { academicHistory, recommendation } = useAcademicHistoryContext();
@@ -12,9 +14,11 @@ export default function Home() {
     return <Recommendation />;
   }
 
-  if (academicHistory) {
-    return <AcademicHistoryGrid />;
-  }
+  return (
+    <Box display="flex" flexDirection="column" gap={3} pt={3}>
+      <Hero />
 
-  return <AcademicHistoryUpload />;
+      {academicHistory ? <AcademicHistoryGrid /> : <AcademicHistoryUpload />}
+    </Box>
+  );
 }

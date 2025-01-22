@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useEffect, useRef } from 'react';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import useExtractAcademicHistory from '@/hooks/useExtractAcademicHistory';
@@ -35,25 +35,32 @@ export default function AcademicHistoryUpload() {
   };
 
   return (
-    <AcademicHistoryContainer>
-      <input
-        type="file"
-        accept="application/pdf"
-        style={{ display: 'none' }}
-        ref={fileInputRef}
-        onChange={handleFileChange}
-      />
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleButtonClick}
-        disabled={loading}
-        loading={loading}
-        startIcon={<UploadFileIcon />}
+    <AcademicHistoryContainer step={1} totalSteps={2}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100%"
       >
-        Selecionar histórico
-      </Button>
+        <input
+          type="file"
+          accept="application/pdf"
+          style={{ display: 'none' }}
+          ref={fileInputRef}
+          onChange={handleFileChange}
+        />
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleButtonClick}
+          disabled={loading}
+          loading={loading}
+          startIcon={<UploadFileIcon />}
+        >
+          Selecionar histórico
+        </Button>
+      </Box>
     </AcademicHistoryContainer>
   );
 }

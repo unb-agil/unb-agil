@@ -13,7 +13,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <AppBar />
 
-      <Container sx={{ height: '100%' }} maxWidth="lg">
+      <Container sx={{ height: '100%' }} maxWidth="md">
         <AcademicHistoryProvider>{children}</AcademicHistoryProvider>
       </Container>
     </Box>
