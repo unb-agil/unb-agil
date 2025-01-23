@@ -43,6 +43,35 @@ class CurriculumComponentController {
 
     return await this.repository.save(newCurriculumComponents);
   }
+
+  async search(request: Request) {
+    const { curriculumSigaaId, type, query } = request.query;
+
+    const queryBuilder = this.repository
+      .createQueryBuilder('curriculumComponent')
+      .leftJoinAndSelect('curriculumComponent.component', 'component')
+      .leftJoinAndSelect('curriculumComponent.curriculum', 'curriculum');
+
+    if (curriculumSigaaId) {
+      queryBuilder.andWhere('curriculum.sigaaId = :curriculumSigaaId', {
+        curriculumSigaaId,
+      });
+    }
+
+    if (type) {
+      queryBuilder.andWhere('curriculumComponent.type = :type', { type });
+    }
+
+    if (query) {
+      queryBuilder.andWhere('component.title LIKE :query', {
+        query: `%${query}%`,
+      });
+    }
+
+    const components = await queryBuilder.limit(10).getMany();
+
+    return components.map((cc) => cc.component);
+  }
 }
 
 export default CurriculumComponentController;

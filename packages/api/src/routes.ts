@@ -74,6 +74,12 @@ export const Routes = [
     action: 'batchSaveOrUpdate',
   },
   {
+    method: 'get',
+    route: '/curricula-components/search',
+    controller: CurriculumComponentController,
+    action: 'search',
+  },
+  {
     method: 'post',
     route: '/academic-history',
     controller: AcademicHistoryController,

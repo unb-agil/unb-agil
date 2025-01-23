@@ -1,20 +1,53 @@
-import { useEffect, useState } from 'react';
-import { Box, Button, Slider, Typography } from '@mui/material';
+import { SyntheticEvent, useEffect, useState } from 'react';
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Slider,
+  TextField,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+} from '@mui/material';
+import capitalize from 'capitalize-pt-br';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import useGetRecommendation from '@/hooks/useGetRecommendation';
+import useGetComponents from '@/hooks/useGetComponents';
 
 export default function AcademicHistoryForm() {
   const { academicHistory, setRecommendation } = useAcademicHistoryContext();
   const [maxWorkloadByPeriod, setMaxWorkloadByPeriod] = useState(24);
-  const { recommend, data } = useGetRecommendation();
+  const { recommend, data: recommendationData } = useGetRecommendation();
+  const { search, data: components } = useGetComponents();
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
-    if (!data) {
+    if (!recommendationData) {
       return;
     }
 
-    setRecommendation(data);
-  }, [data, setRecommendation]);
+    setRecommendation(recommendationData);
+  }, [recommendationData, setRecommendation]);
+
+  useEffect(() => {
+    if (!academicHistory?.curriculumSigaaId) {
+      return;
+    }
+
+    search({
+      curriculumSigaaId: academicHistory.curriculumSigaaId,
+      type: 'ELECTIVE',
+      query,
+    });
+  }, [academicHistory?.curriculumSigaaId, query, search]);
+
+  useEffect(() => {
+    if (!components) {
+      return;
+    }
+
+    console.log(components);
+  }, [components]);
 
   const handleSliderChange = (_event: Event, newValue: number | number[]) => {
     setMaxWorkloadByPeriod(newValue as number);
@@ -28,6 +61,13 @@ export default function AcademicHistoryForm() {
     recommend(academicHistory, {
       maxWorkloadByPeriod: maxWorkloadByPeriod * 15,
     });
+  };
+
+  const handleQueryChange = (
+    _event: SyntheticEvent<Element, Event>,
+    value: string,
+  ) => {
+    setQuery(value);
   };
 
   return (
@@ -59,6 +99,56 @@ export default function AcademicHistoryForm() {
 
           <Typography variant="body1">32</Typography>
         </Box>
+      </Box>
+
+      <Box>
+        <Typography variant="body2" fontWeight={700} gutterBottom>
+          Componentes optativos
+        </Typography>
+
+        <Autocomplete
+          sx={{
+            '.MuiAutocomplete-inputRoot': {
+              flexWrap: 'nowrap !important',
+              overflow: 'hidden',
+            },
+          }}
+          fullWidth
+          multiple
+          limitTags={2}
+          options={components || []}
+          disableCloseOnSelect
+          noOptionsText="Nenhum componente encontrado"
+          isOptionEqualToValue={(option, value) =>
+            option.sigaaId === value.sigaaId
+          }
+          getOptionLabel={(component) => component.sigaaId}
+          filterOptions={(x) => x}
+          renderInput={(params) => {
+            return <TextField {...params} />;
+          }}
+          renderOption={({ key, ...optionProps }, component, { selected }) => (
+            <li key={key} {...optionProps}>
+              <FormControlLabel
+                value="end"
+                control={<Checkbox size="small" checked={selected} />}
+                label={
+                  <>
+                    <Typography variant="caption" color="textSecondary">
+                      {component.sigaaId}
+                    </Typography>
+
+                    <Typography variant="body2">
+                      {capitalize(component.title, ['para'])}
+                    </Typography>
+                  </>
+                }
+                labelPlacement="end"
+              />
+            </li>
+          )}
+          onInputChange={handleQueryChange}
+        />
       </Box>
 
       <Box flexGrow={1} />
