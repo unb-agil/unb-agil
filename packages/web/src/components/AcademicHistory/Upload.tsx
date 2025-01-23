@@ -35,7 +35,7 @@ export default function AcademicHistoryUpload() {
   };
 
   return (
-    <AcademicHistoryContainer step={1} totalSteps={2}>
+    <AcademicHistoryContainer>
       <Box
         display="flex"
         justifyContent="center"

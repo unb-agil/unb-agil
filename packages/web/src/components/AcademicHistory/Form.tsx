@@ -8,6 +8,7 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
+  Alert,
 } from '@mui/material';
 import capitalize from 'capitalize-pt-br';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
@@ -71,10 +72,16 @@ export default function AcademicHistoryForm() {
   };
 
   return (
-    <Box display="flex" flexDirection="column" height="100%">
-      <Typography variant="h5" fontWeight={700} gutterBottom>
-        Opções
+    <Box display="flex" flexDirection="column" height="100%" gap={2}>
+      <Typography variant="h5" fontWeight={700}>
+        Opções de recomendação
       </Typography>
+
+      <Alert severity="info" variant="outlined">
+        <Typography variant="body2">
+          Defina as opções da sua recomendação personalizada de disciplinas.
+        </Typography>
+      </Alert>
 
       <Box>
         <Typography variant="body2" fontWeight={700} gutterBottom>
@@ -125,7 +132,7 @@ export default function AcademicHistoryForm() {
           getOptionLabel={(component) => component.sigaaId}
           filterOptions={(x) => x}
           renderInput={(params) => {
-            return <TextField {...params} />;
+            return <TextField {...params} size="small" />;
           }}
           renderOption={({ key, ...optionProps }, component, { selected }) => (
             <li key={key} {...optionProps}>
