@@ -1,4 +1,4 @@
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -14,13 +14,29 @@ import capitalize from 'capitalize-pt-br';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import useGetRecommendation from '@/hooks/useGetRecommendation';
 import useGetComponents from '@/hooks/useGetComponents';
+import useGetCurriculum from '@/hooks/useGetCurriculum';
 
 export default function AcademicHistoryForm() {
   const { academicHistory, setRecommendation } = useAcademicHistoryContext();
   const [maxWorkloadByPeriod, setMaxWorkloadByPeriod] = useState(24);
   const { recommend, data: recommendationData } = useGetRecommendation();
   const { search, data: components } = useGetComponents();
+  const { curriculum } = useGetCurriculum(academicHistory?.curriculumSigaaId);
   const [query, setQuery] = useState('');
+
+  const periodWorkloadCredits = useMemo(() => {
+    if (!curriculum?.minPeriodWorkload || !curriculum?.maxPeriodWorkload) {
+      return {
+        min: 0,
+        max: 0,
+      };
+    }
+
+    return {
+      min: curriculum.minPeriodWorkload / 15,
+      max: curriculum.maxPeriodWorkload / 15,
+    };
+  }, [curriculum]);
 
   useEffect(() => {
     if (!recommendationData) {
@@ -94,17 +110,17 @@ export default function AcademicHistoryForm() {
           justifyContent="space-between"
           gap={2}
         >
-          <Typography variant="body1">10</Typography>
+          <Typography variant="body1">{periodWorkloadCredits.min}</Typography>
 
           <Slider
-            min={10}
-            max={32}
+            min={periodWorkloadCredits.min}
+            max={periodWorkloadCredits.max}
             value={maxWorkloadByPeriod}
             valueLabelDisplay="auto"
             onChange={handleSliderChange}
           />
 
-          <Typography variant="body1">32</Typography>
+          <Typography variant="body1">{periodWorkloadCredits.max}</Typography>
         </Box>
       </Box>
 

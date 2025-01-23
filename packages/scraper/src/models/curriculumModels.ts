@@ -9,6 +9,8 @@ export interface CurriculumData {
   startPeriod: string;
   minPeriods: number;
   maxPeriods: number;
+  minPeriodWorkload: number;
+  maxPeriodWorkload: number;
   programSigaaId: Program['sigaaId'];
 }
 

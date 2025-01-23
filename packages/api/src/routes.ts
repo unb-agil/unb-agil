@@ -51,6 +51,12 @@ export const Routes = [
   },
   {
     method: 'get',
+    route: '/curricula',
+    controller: CurriculumController,
+    action: 'get',
+  },
+  {
+    method: 'get',
     route: '/curricula/:sigaaId/program',
     controller: CurriculumController,
     action: 'getProgram',

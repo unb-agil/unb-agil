@@ -54,12 +54,22 @@ class CurriculumScraper implements BaseScraper {
       startPeriod: await this.extractAttribute(page, 'Entrada em Vigor'),
       minPeriods: await this.extractAttribute(page, 'Mínimo'),
       maxPeriods: await this.extractAttribute(page, 'Máximo'),
+      minWorkloadByPeriod: await this.extractAttribute(
+        page,
+        'Carga Horária Mínima por Período Letivo',
+      ),
+      maxWorkloadByPeriod: await this.extractAttribute(
+        page,
+        'Carga Horária Máxima por Período Letivo',
+      ),
     };
 
     return {
       startPeriod: rawData.startPeriod,
       minPeriods: parseInt(rawData.minPeriods, 10),
       maxPeriods: parseInt(rawData.maxPeriods, 10),
+      minPeriodWorkload: parseInt(rawData.minWorkloadByPeriod, 10),
+      maxPeriodWorkload: parseInt(rawData.maxWorkloadByPeriod, 10),
       programSigaaId,
     };
   }

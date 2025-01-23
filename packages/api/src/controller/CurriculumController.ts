@@ -52,17 +52,21 @@ class CurriculumController {
     const curriculum = await this.repository.findOneBy({ sigaaId });
     return curriculum.program;
   }
-  
 
   async getPeriodWorkload(request: Request) {
     const sigaaId = decodeURIComponent(request.params.sigaaId);
-  
-    const {minPeriodWorkload, maxPeriodWorkload} = await this.repository.findOneBy({ sigaaId });
-    
-    return {minPeriodWorkload, maxPeriodWorkload}
-  
+
+    const { minPeriodWorkload, maxPeriodWorkload } =
+      await this.repository.findOneBy({ sigaaId });
+
+    return { minPeriodWorkload, maxPeriodWorkload };
   }
-  
+
+  async get(request: Request) {
+    const { sigaaId } = request.query;
+
+    return await this.repository.findOneBy({ sigaaId: sigaaId as string });
+  }
 }
 
 export default CurriculumController;
