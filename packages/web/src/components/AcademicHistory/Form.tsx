@@ -1,4 +1,4 @@
-import { SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -20,25 +20,11 @@ import { Info } from '@mui/icons-material';
 export default function AcademicHistoryForm() {
   const { academicHistory, setRecommendation, setAcademicHistory } =
     useAcademicHistoryContext();
-  const [maxWorkloadByPeriod, setMaxWorkloadByPeriod] = useState(24);
+  const [maxWorkloadByPeriod, setMaxWorkloadByPeriod] = useState(360);
   const { recommend, data: recommendationData } = useGetRecommendation();
   const { search, data: components } = useGetComponents();
   const { curriculum } = useGetCurriculum(academicHistory?.curriculumSigaaId);
   const [query, setQuery] = useState('');
-
-  const periodWorkloadCredits = useMemo(() => {
-    if (!curriculum?.minPeriodWorkload || !curriculum?.maxPeriodWorkload) {
-      return {
-        min: 0,
-        max: 0,
-      };
-    }
-
-    return {
-      min: curriculum.minPeriodWorkload / 15,
-      max: curriculum.maxPeriodWorkload / 15,
-    };
-  }, [curriculum]);
 
   useEffect(() => {
     if (!recommendationData) {
@@ -81,9 +67,7 @@ export default function AcademicHistoryForm() {
       return;
     }
 
-    recommend(academicHistory, {
-      maxWorkloadByPeriod: maxWorkloadByPeriod * 15,
-    });
+    recommend(academicHistory, { maxWorkloadByPeriod });
   };
 
   const handleQueryChange = (
@@ -92,6 +76,10 @@ export default function AcademicHistoryForm() {
   ) => {
     setQuery(value);
   };
+
+  if (!academicHistory) {
+    return null;
+  }
 
   return (
     <Box display="flex" flexDirection="column" height="100%" gap={2}>
@@ -122,7 +110,7 @@ export default function AcademicHistoryForm() {
             alignItems="start"
           >
             <Typography variant="body1" noWrap>
-              240h
+              {curriculum?.minPeriodWorkload}h
             </Typography>
           </Box>
 
@@ -140,6 +128,8 @@ export default function AcademicHistoryForm() {
             min={curriculum?.minPeriodWorkload}
             max={curriculum?.maxPeriodWorkload}
             value={maxWorkloadByPeriod}
+            step={15}
+            valueLabelFormat={(value) => `${value}h (${value / 15} créditos)`}
             valueLabelDisplay="on"
             onChange={handleSliderChange}
           />
@@ -151,7 +141,7 @@ export default function AcademicHistoryForm() {
             alignItems="end"
           >
             <Typography variant="body1" noWrap>
-              240h
+              {curriculum?.maxPeriodWorkload}h
             </Typography>
           </Box>
         </Box>
@@ -204,7 +194,7 @@ export default function AcademicHistoryForm() {
                 label={
                   <>
                     <Typography variant="caption" color="textSecondary">
-                      {component.sigaaId}
+                      {component.sigaaId} — {component.totalWorkload}h
                     </Typography>
 
                     <Typography variant="body2">
