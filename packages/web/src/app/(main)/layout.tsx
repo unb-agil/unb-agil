@@ -10,7 +10,7 @@ type MainLayoutProps = Readonly<{
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar />
 
       <Container sx={{ height: '100%' }} maxWidth="md">
