@@ -8,16 +8,18 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
-  Alert,
+  Tooltip,
 } from '@mui/material';
 import capitalize from 'capitalize-pt-br';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import useGetRecommendation from '@/hooks/useGetRecommendation';
 import useGetComponents from '@/hooks/useGetComponents';
 import useGetCurriculum from '@/hooks/useGetCurriculum';
+import { Info } from '@mui/icons-material';
 
 export default function AcademicHistoryForm() {
-  const { academicHistory, setRecommendation } = useAcademicHistoryContext();
+  const { academicHistory, setRecommendation, setAcademicHistory } =
+    useAcademicHistoryContext();
   const [maxWorkloadByPeriod, setMaxWorkloadByPeriod] = useState(24);
   const { recommend, data: recommendationData } = useGetRecommendation();
   const { search, data: components } = useGetComponents();
@@ -70,6 +72,10 @@ export default function AcademicHistoryForm() {
     setMaxWorkloadByPeriod(newValue as number);
   };
 
+  const handleCancelClick = () => {
+    setAcademicHistory(null);
+  };
+
   const handleOnButtonClick = () => {
     if (!academicHistory) {
       return;
@@ -89,48 +95,82 @@ export default function AcademicHistoryForm() {
 
   return (
     <Box display="flex" flexDirection="column" height="100%" gap={2}>
-      <Typography variant="h5" fontWeight={700}>
-        Opções de recomendação
-      </Typography>
+      <Typography variant="h5">Opções de recomendação</Typography>
 
-      <Alert severity="info" variant="outlined">
-        <Typography variant="body2">
-          Defina as opções da sua recomendação personalizada de disciplinas.
-        </Typography>
-      </Alert>
+      <Box mt={2}>
+        <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
+          <Typography variant="body2" fontWeight={700}>
+            Carga horária máxima por período
+          </Typography>
 
-      <Box>
-        <Typography variant="body2" fontWeight={700} gutterBottom>
-          Créditos por semestre
-        </Typography>
+          <Tooltip title="Um crédito equivale a 15 horas.">
+            <Info color="primary" fontSize="small" />
+          </Tooltip>
+        </Box>
 
         <Box
+          mt={1}
           display="flex"
           alignItems="center"
           justifyContent="space-between"
           gap={2}
         >
-          <Typography variant="body1">{periodWorkloadCredits.min}</Typography>
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="start"
+          >
+            <Typography variant="body1" noWrap>
+              240h
+            </Typography>
+          </Box>
 
           <Slider
-            min={periodWorkloadCredits.min}
-            max={periodWorkloadCredits.max}
+            sx={{
+              '.MuiSlider-valueLabel': {
+                top: '55px',
+              },
+
+              '.MuiSlider-valueLabel::before': {
+                bottom: '50%',
+                top: -8,
+              },
+            }}
+            min={curriculum?.minPeriodWorkload}
+            max={curriculum?.maxPeriodWorkload}
             value={maxWorkloadByPeriod}
-            valueLabelDisplay="auto"
+            valueLabelDisplay="on"
             onChange={handleSliderChange}
           />
 
-          <Typography variant="body1">{periodWorkloadCredits.max}</Typography>
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="end"
+          >
+            <Typography variant="body1" noWrap>
+              240h
+            </Typography>
+          </Box>
         </Box>
       </Box>
 
-      <Box>
-        <Typography variant="body2" fontWeight={700} gutterBottom>
-          Componentes optativos
-        </Typography>
+      <Box mt={2}>
+        <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
+          <Typography variant="body2" fontWeight={700}>
+            Componentes optativos
+          </Typography>
+
+          <Tooltip title="Todos os requisitos para cada componente serão incluídos automaticamente.">
+            <Info color="primary" fontSize="small" />
+          </Tooltip>
+        </Box>
 
         <Autocomplete
           sx={{
+            mt: 1,
             '.MuiAutocomplete-inputRoot': {
               flexWrap: 'nowrap !important',
               overflow: 'hidden',
@@ -148,7 +188,13 @@ export default function AcademicHistoryForm() {
           getOptionLabel={(component) => component.sigaaId}
           filterOptions={(x) => x}
           renderInput={(params) => {
-            return <TextField {...params} size="small" />;
+            return (
+              <TextField
+                {...params}
+                size="small"
+                sx={{ backgroundColor: '#fff' }}
+              />
+            );
           }}
           renderOption={({ key, ...optionProps }, component, { selected }) => (
             <li key={key} {...optionProps}>
@@ -177,7 +223,7 @@ export default function AcademicHistoryForm() {
       <Box flexGrow={1} />
 
       <Box display="flex" flexDirection="row" justifyContent="end" gap={2}>
-        <Button variant="outlined" color="primary">
+        <Button variant="outlined" color="primary" onClick={handleCancelClick}>
           Cancelar
         </Button>
 

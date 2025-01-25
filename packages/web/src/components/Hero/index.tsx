@@ -18,8 +18,7 @@ export default function Hero() {
 
             <Typography variant="body2">
               O UnB Ágil calcula quais disciplinas você deve priorizar em cada
-              semestre de acordo com o seu histórico acadêmico. Você também pode
-              incluir disciplinas optativas em sua recomendação.
+              semestre.
             </Typography>
           </Box>
 

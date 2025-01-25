@@ -5,7 +5,6 @@ import { Box, Button } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import useExtractAcademicHistory from '@/hooks/useExtractAcademicHistory';
-import AcademicHistoryContainer from '@/components/AcademicHistory/Container';
 
 export default function AcademicHistoryUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,32 +34,34 @@ export default function AcademicHistoryUpload() {
   };
 
   return (
-    <AcademicHistoryContainer>
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100%"
-      >
-        <input
-          type="file"
-          accept="application/pdf"
-          style={{ display: 'none' }}
-          ref={fileInputRef}
-          onChange={handleFileChange}
-        />
+    <Box
+      height="300px"
+      border="2px dashed"
+      borderColor="primary.main"
+      borderRadius="8px"
+      padding={3}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <input
+        type="file"
+        accept="application/pdf"
+        style={{ display: 'none' }}
+        ref={fileInputRef}
+        onChange={handleFileChange}
+      />
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleButtonClick}
-          disabled={loading}
-          loading={loading}
-          startIcon={<UploadFileIcon />}
-        >
-          Selecionar histórico
-        </Button>
-      </Box>
-    </AcademicHistoryContainer>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleButtonClick}
+        disabled={loading}
+        loading={loading}
+        startIcon={<UploadFileIcon />}
+      >
+        Selecionar histórico
+      </Button>
+    </Box>
   );
 }

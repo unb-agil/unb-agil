@@ -2,10 +2,10 @@
 
 import { Box } from '@mui/material';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
-import AcademicHistoryGrid from '@/components/AcademicHistory/Grid';
 import AcademicHistoryUpload from '@/components/AcademicHistory/Upload';
 import Recommendation from '@/components/Recommendation';
 import Hero from '@/components/Hero';
+import RecommendationOptions from '@/components/AcademicHistory/Grid';
 
 export default function Home() {
   const { academicHistory, recommendation } = useAcademicHistoryContext();
@@ -18,7 +18,7 @@ export default function Home() {
     <Box display="flex" flexDirection="column" gap={3} pt={3}>
       <Hero />
 
-      {academicHistory ? <AcademicHistoryGrid /> : <AcademicHistoryUpload />}
+      {academicHistory ? <RecommendationOptions /> : <AcademicHistoryUpload />}
     </Box>
   );
 }
