@@ -16,15 +16,18 @@ import useGetRecommendation from '@/hooks/useGetRecommendation';
 import useGetComponents from '@/hooks/useGetComponents';
 import useGetCurriculum from '@/hooks/useGetCurriculum';
 import { Info } from '@mui/icons-material';
+import { Component } from '@/models/entities';
 
 export default function AcademicHistoryForm() {
   const { academicHistory, setRecommendation, setAcademicHistory } =
     useAcademicHistoryContext();
+
   const [maxWorkloadByPeriod, setMaxWorkloadByPeriod] = useState(360);
   const { recommend, data: recommendationData } = useGetRecommendation();
   const { search, data: components } = useGetComponents();
   const { curriculum } = useGetCurriculum(academicHistory?.curriculumSigaaId);
   const [query, setQuery] = useState('');
+  const [selectedElectives, setSelectedElectives] = useState<Component[]>([]);
 
   useEffect(() => {
     if (!recommendationData) {
@@ -46,14 +49,6 @@ export default function AcademicHistoryForm() {
     });
   }, [academicHistory?.curriculumSigaaId, query, search]);
 
-  useEffect(() => {
-    if (!components) {
-      return;
-    }
-
-    console.log(components);
-  }, [components]);
-
   const handleSliderChange = (_event: Event, newValue: number | number[]) => {
     setMaxWorkloadByPeriod(newValue as number);
   };
@@ -67,7 +62,17 @@ export default function AcademicHistoryForm() {
       return;
     }
 
-    recommend(academicHistory, { maxWorkloadByPeriod });
+    const electiveIds = selectedElectives.map((component) => component.sigaaId);
+
+    const newAcademicHistory = {
+      ...academicHistory,
+      components: {
+        ...academicHistory.components,
+        remaining: [...academicHistory.components.remaining, ...electiveIds],
+      },
+    };
+
+    recommend(newAcademicHistory, { maxWorkloadByPeriod });
   };
 
   const handleQueryChange = (
@@ -75,6 +80,14 @@ export default function AcademicHistoryForm() {
     value: string,
   ) => {
     setQuery(value);
+  };
+
+  const handleAutocompleteChange = (
+    _event: SyntheticEvent<Element, Event>,
+    value: Component[],
+  ) => {
+    console.log('handleAutocompleteChange', value);
+    setSelectedElectives(value);
   };
 
   if (!academicHistory) {
@@ -166,6 +179,7 @@ export default function AcademicHistoryForm() {
               overflow: 'hidden',
             },
           }}
+          value={selectedElectives}
           fullWidth
           multiple
           limitTags={2}
@@ -207,6 +221,7 @@ export default function AcademicHistoryForm() {
             </li>
           )}
           onInputChange={handleQueryChange}
+          onChange={handleAutocompleteChange}
         />
       </Box>
 

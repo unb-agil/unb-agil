@@ -1,13 +1,16 @@
 import fs from 'fs';
 import { Request } from 'express';
-import { extractAcademicHistory } from '@unb-agil/academic-history';
+import { AcademicHistoryFile } from '@unb-agil/academic-history';
 
 class AcademicHistoryController {
   async extract(request: Request) {
     const filePath = request.file.path;
+    const academicHistoryFile = new AcademicHistoryFile(filePath);
 
     try {
-      return await extractAcademicHistory(filePath);
+      return await academicHistoryFile.extract();
+    } catch (error) {
+      console.error(error);
     } finally {
       fs.unlinkSync(filePath);
     }

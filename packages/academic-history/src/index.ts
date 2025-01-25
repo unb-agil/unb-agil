@@ -2,180 +2,190 @@ import fs from 'fs';
 import pdf2table from 'pdf2table';
 import { AcademicHistory } from './models';
 
-const academicHistory: AcademicHistory = {
-  programTitle: '',
-  departmentAcronym: '',
-  curriculumSigaaId: '',
-  components: {
-    completed: [],
-    remaining: [],
-  },
-  workloads: {
-    required: {
-      mandatory: 0,
-      elective: 0,
-      complementary: 0,
-      total: 0,
-    },
-    completed: {
-      mandatory: 0,
-      elective: 0,
-      complementary: 0,
-      total: 0,
-    },
-    remaining: {
-      mandatory: 0,
-      elective: 0,
-      complementary: 0,
-      total: 0,
-    },
-  },
-};
+class AcademicHistoryFile {
+  private filePath: string;
+  private academicHistory: AcademicHistory;
 
-function handleProgramRow(row: string[]) {
-  const isProgramRow = row[0] === 'Curso:' && row[1].split(' - ').length > 1;
-
-  if (!isProgramRow) {
-    return;
+  constructor(filePath: string) {
+    this.filePath = filePath;
+    this.academicHistory = {
+      programTitle: '',
+      departmentAcronym: '',
+      curriculumSigaaId: '',
+      components: {
+        completed: [],
+        remaining: [],
+      },
+      workloads: {
+        required: {
+          mandatory: 0,
+          elective: 0,
+          complementary: 0,
+          total: 0,
+        },
+        completed: {
+          mandatory: 0,
+          elective: 0,
+          complementary: 0,
+          total: 0,
+        },
+        remaining: {
+          mandatory: 0,
+          elective: 0,
+          complementary: 0,
+          total: 0,
+        },
+      },
+    };
   }
 
-  const [programTitle, departmentAcronym] = row[1].split(' - ')[0].split('/');
-  academicHistory.programTitle = programTitle;
-  academicHistory.departmentAcronym = departmentAcronym;
-}
+  private handleProgramRow(row: string[]) {
+    const isProgramRow = row[0] === 'Curso:' && row[1].split(' - ').length > 1;
 
-function handleCurriculumRow(row: string[]) {
-  const isCurriculumRow = row[0] === 'Currículo:';
+    if (!isProgramRow) {
+      return;
+    }
 
-  if (!isCurriculumRow) {
-    return;
+    const [programTitle, departmentAcronym] = row[1].split(' - ')[0].split('/');
+    this.academicHistory.programTitle = programTitle;
+    this.academicHistory.departmentAcronym = departmentAcronym;
   }
 
-  const curriculumId = row[1].split(' ')[0];
-  academicHistory.curriculumSigaaId = curriculumId;
-}
+  private handleCurriculumRow(row: string[]) {
+    const isCurriculumRow = row[0] === 'Currículo:';
 
-function handleRequiredWorkloadRow(row: string[]) {
-  const isRequiredWorkloadRow = row[0] === 'Exigido';
+    if (!isCurriculumRow) {
+      return;
+    }
 
-  if (!isRequiredWorkloadRow) {
-    return;
+    const curriculumId = row[1].split(' ')[0];
+    this.academicHistory.curriculumSigaaId = curriculumId;
   }
 
-  const [, mandatory, elective, complementary, total] = row;
+  private handleRequiredWorkloadRow(row: string[]) {
+    const isRequiredWorkloadRow = row[0] === 'Exigido';
 
-  academicHistory.workloads.required = {
-    mandatory: parseInt(mandatory),
-    elective: parseInt(elective),
-    complementary: parseInt(complementary),
-    total: parseInt(total),
-  };
-}
+    if (!isRequiredWorkloadRow) {
+      return;
+    }
 
-function handleCompletedWorkloadRow(row: string[]) {
-  const isCompletedWorkloadRow = row[0] === 'Integralizado';
+    const [, mandatory, elective, complementary, total] = row;
 
-  if (!isCompletedWorkloadRow) {
-    return;
+    this.academicHistory.workloads.required = {
+      mandatory: parseInt(mandatory),
+      elective: parseInt(elective),
+      complementary: parseInt(complementary),
+      total: parseInt(total),
+    };
   }
 
-  const [, mandatory, elective, complementary, total] = row;
+  private handleCompletedWorkloadRow(row: string[]) {
+    const isCompletedWorkloadRow = row[0] === 'Integralizado';
 
-  academicHistory.workloads.completed = {
-    mandatory: parseInt(mandatory),
-    elective: parseInt(elective),
-    complementary: parseInt(complementary),
-    total: parseInt(total),
-  };
-}
+    if (!isCompletedWorkloadRow) {
+      return;
+    }
 
-function handleRemainingWorkloadRow(row: string[]) {
-  const isRemainingWorkloadRow = row[0] === 'Pendente';
+    const [, mandatory, elective, complementary, total] = row;
 
-  if (!isRemainingWorkloadRow) {
-    return;
+    this.academicHistory.workloads.completed = {
+      mandatory: parseInt(mandatory),
+      elective: parseInt(elective),
+      complementary: parseInt(complementary),
+      total: parseInt(total),
+    };
   }
 
-  const [, mandatory, elective, complementary, total] = row;
+  private handleRemainingWorkloadRow(row: string[]) {
+    const isRemainingWorkloadRow = row[0] === 'Pendente';
 
-  academicHistory.workloads.remaining = {
-    mandatory: parseInt(mandatory),
-    elective: parseInt(elective),
-    complementary: parseInt(complementary),
-    total: parseInt(total),
-  };
-}
+    if (!isRemainingWorkloadRow) {
+      return;
+    }
 
-function handleWorkloadRow(row: string[]) {
-  handleRequiredWorkloadRow(row);
-  handleCompletedWorkloadRow(row);
-  handleRemainingWorkloadRow(row);
-}
+    const [, mandatory, elective, complementary, total] = row;
 
-function handleCompletedComponentRow(row: string[]) {
-  const isCompletedComponentRow = row.at(-1) === 'APR' || row.at(-1) === 'DISP';
-
-  if (!isCompletedComponentRow) {
-    return;
+    this.academicHistory.workloads.remaining = {
+      mandatory: parseInt(mandatory),
+      elective: parseInt(elective),
+      complementary: parseInt(complementary),
+      total: parseInt(total),
+    };
   }
 
-  const componentSigaaId = row
-    .slice(1, 3)
-    .find((element) => element.match(/[A-Z]+\d+/));
-
-  if (!componentSigaaId) {
-    return;
+  private handleWorkloadRow(row: string[]) {
+    this.handleRequiredWorkloadRow(row);
+    this.handleCompletedWorkloadRow(row);
+    this.handleRemainingWorkloadRow(row);
   }
 
-  academicHistory.components.completed.push(componentSigaaId);
-}
+  private handleCompletedComponentRow(row: string[]) {
+    const isCompletedComponentRow =
+      row.at(-1) === 'APR' || row.at(-1) === 'DISP';
 
-function handleEquivalentComponentRow(row: string[]) {
-  const isEquivalentComponentRow = row[0].match(/Cumpriu [A-Z]+\d+/);
+    if (!isCompletedComponentRow) {
+      return;
+    }
 
-  if (!isEquivalentComponentRow) {
-    return;
+    const componentSigaaId = row
+      .slice(1, 3)
+      .find((element) => element.match(/[A-Z]+\d+/));
+
+    if (!componentSigaaId) {
+      return;
+    }
+
+    this.academicHistory.components.completed.push(componentSigaaId);
   }
 
-  const componentSigaaId = row[0].split(' ')[1];
+  private handleEquivalentComponentRow(row: string[]) {
+    const isEquivalentComponentRow = row[0].match(/Cumpriu [A-Z]+\d+/);
 
-  academicHistory.components.completed.push(componentSigaaId);
-}
+    if (!isEquivalentComponentRow) {
+      return;
+    }
 
-function handleRemainingComponentRow(row: string[]) {
-  const isLastColumnWorkload = row.at(-1)?.match(/\d+ h$/);
-  const hasRowLength = row.length === 3 || row.length === 4;
-  const isRemainingComponentRow = isLastColumnWorkload && hasRowLength;
+    const componentSigaaId = row[0].split(' ')[1];
 
-  if (!isRemainingComponentRow) {
-    return;
+    this.academicHistory.components.completed.push(componentSigaaId);
   }
 
-  const componentSigaaId = row[0];
-  academicHistory.components.remaining.push(componentSigaaId);
-}
+  private handleRemainingComponentRow(row: string[]) {
+    const isLastColumnWorkload = row.at(-1)?.match(/\d+ h$/);
+    const hasRowLength = row.length === 3 || row.length === 4;
+    const isRemainingComponentRow = isLastColumnWorkload && hasRowLength;
 
-export function extractAcademicHistory(filePath: string) {
-  const file = fs.readFileSync(filePath);
+    if (!isRemainingComponentRow) {
+      return;
+    }
 
-  return new Promise<AcademicHistory>((resolve, reject) => {
-    pdf2table.parse(file, (error: unknown, rows: string[][]) => {
-      if (error) {
-        return reject(error);
-      }
+    const componentSigaaId = row[0];
+    this.academicHistory.components.remaining.push(componentSigaaId);
+  }
 
-      rows.forEach((row) => {
-        handleProgramRow(row);
-        handleCurriculumRow(row);
-        handleWorkloadRow(row);
-        handleCompletedComponentRow(row);
-        handleEquivalentComponentRow(row);
-        handleRemainingComponentRow(row);
+  async extract(): Promise<AcademicHistory> {
+    const file = fs.readFileSync(this.filePath);
+
+    return await new Promise<AcademicHistory>((resolve, reject) => {
+      pdf2table.parse(file, (error: unknown, rows: string[][]) => {
+        if (error) {
+          return reject(error);
+        }
+
+        rows.forEach((row) => {
+          this.handleProgramRow(row);
+          this.handleCurriculumRow(row);
+          this.handleWorkloadRow(row);
+          this.handleCompletedComponentRow(row);
+          this.handleEquivalentComponentRow(row);
+          this.handleRemainingComponentRow(row);
+        });
+
+        resolve(this.academicHistory);
       });
-
-      resolve(academicHistory);
     });
-  });
+  }
 }
 
+export { AcademicHistoryFile };
 export type { AcademicHistory };
