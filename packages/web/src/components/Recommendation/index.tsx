@@ -12,17 +12,12 @@ export default function Recommendation() {
   return (
     <Box display="flex" flexDirection="column" gap={5}>
       {recommendation.map((period, index) => (
-        <Box key={index}>
-          <Typography
-            variant="h5"
-            gutterBottom
-            color="primary"
-            fontWeight={700}
-          >
-            Período {index + 1}
-          </Typography>
+        <>
+          <Box key={index} display="flex" flexDirection="column" gap={2}>
+            <Box key={index} display="flex" gap={2}>
+              <Typography variant="h5">Período {index + 1}</Typography>
+            </Box>
 
-          <Box display="flex" gap={3}>
             {period.map((component) => (
               <RecommendationCard
                 key={component.sigaaId}
@@ -30,7 +25,7 @@ export default function Recommendation() {
               />
             ))}
           </Box>
-        </Box>
+        </>
       ))}
     </Box>
   );

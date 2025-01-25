@@ -1,4 +1,5 @@
-import { Card, CardContent, Typography } from '@mui/material';
+import { Box, Chip, Typography } from '@mui/material';
+import capitalize from 'capitalize-pt-br';
 import { Component } from '@/models/entities';
 
 interface RecommendationCardProps {
@@ -9,16 +10,30 @@ export default function RecommendationCard({
   component,
 }: RecommendationCardProps) {
   return (
-    <Card sx={{ minWidth: 300, maxWidth: 300 }}>
-      <CardContent>
-        <Typography variant="caption" color="textSecondary" gutterBottom>
-          {component.sigaaId}
-        </Typography>
+    <Box
+      p={1}
+      borderRadius={1}
+      bgcolor="white"
+      display="flex"
+      alignItems="center"
+      gap={1}
+    >
+      <Chip
+        label={component.sigaaId}
+        variant="outlined"
+        size="small"
+        color="primary"
+      />
 
-        <Typography variant="body1" component="div">
-          {component.title}
+      <Typography sx={{ flexGrow: 1 }} variant="body1" fontWeight={500}>
+        {capitalize(component.title, ['para'])}
+      </Typography>
+
+      <Box>
+        <Typography variant="body1" color="textSecondary" noWrap>
+          {component.totalWorkload}h ({component.totalWorkload / 15} créditos)
         </Typography>
-      </CardContent>
-    </Card>
+      </Box>
+    </Box>
   );
 }
