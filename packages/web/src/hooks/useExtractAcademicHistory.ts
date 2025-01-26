@@ -36,5 +36,12 @@ export default function useExtractAcademicHistory() {
       });
   }, []);
 
-  return { extract, loading, error, data };
+  const reset = () => {
+    console.log('reset');
+    setLoading(false);
+    setError(null);
+    setData(null);
+  };
+
+  return { extract, loading, error, data, reset };
 }
