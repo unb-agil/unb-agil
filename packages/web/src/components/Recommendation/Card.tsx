@@ -22,8 +22,13 @@ export default function RecommendationCard({
     >
       <Box display="flex" alignItems="center" gap={1}>
         <Typography variant="caption" color="textSecondary">
-          {component.sigaaId} — {component.totalWorkload}h (
-          {component.totalWorkload / 15} créditos)
+          {component.sigaaId}
+        </Typography>
+
+        <Box flexGrow={1} />
+
+        <Typography variant="caption" color="textSecondary" noWrap>
+          {component.totalWorkload}h ({component.totalWorkload / 15} créditos)
         </Typography>
       </Box>
 
