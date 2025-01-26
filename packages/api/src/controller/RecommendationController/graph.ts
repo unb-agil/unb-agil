@@ -129,7 +129,20 @@ export default class RequisitesGraph {
       const bestOption = await bestOptionPromise;
       const bestProportion = await this.evaluateOption(bestOption);
       const currentProportion = await this.evaluateOption(currentOption);
-      return currentProportion > bestProportion ? currentOption : bestOption;
+
+      if (currentProportion > bestProportion) {
+        return currentOption;
+      } else if (currentProportion === bestProportion) {
+        const bestRecommendedCount =
+          await this.countRecommendedPeriods(bestOption);
+        const currentRecommendedCount =
+          await this.countRecommendedPeriods(currentOption);
+        return currentRecommendedCount > bestRecommendedCount
+          ? currentOption
+          : bestOption;
+      } else {
+        return bestOption;
+      }
     }, Promise.resolve(options[0]));
   }
 
@@ -151,6 +164,24 @@ export default class RequisitesGraph {
 
     return curriculumComponent
       ? curriculumComponent.type === CurriculumComponentType.MANDATORY
+      : false;
+  }
+
+  private async countRecommendedPeriods(option: Component[]) {
+    const recommendedStatuses = await Promise.all(
+      option.map(({ sigaaId }) => this.hasRecommendedPeriod(sigaaId)),
+    );
+    return recommendedStatuses.filter(Boolean).length;
+  }
+
+  private async hasRecommendedPeriod(componentSigaaId: Component['sigaaId']) {
+    const curriculumComponent = await CurriculumComponentRepository.findOneBy({
+      curriculum: this.curriculum,
+      componentSigaaId,
+    });
+
+    return curriculumComponent
+      ? curriculumComponent.recommendedPeriod !== null
       : false;
   }
 
