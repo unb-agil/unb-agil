@@ -1,30 +1,44 @@
-import { Box, Card, CardContent, Typography } from '@mui/material';
+import { Alert, Box, Card, CardContent, Typography } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Hero() {
   return (
-    <Card elevation={0}>
-      <CardContent sx={{ padding: 3 }}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          gap={3}
-        >
-          <Box>
-            <Typography variant="body1" fontWeight={500} gutterBottom>
-              Forme-se na UnB no menor tempo possível.
-            </Typography>
+    <>
+      <Card elevation={0}>
+        <CardContent sx={{ padding: 3 }}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            gap={3}
+          >
+            <Box>
+              <Typography variant="body1" fontWeight={500} gutterBottom>
+                Otimize o fluxo até a sua formatura.
+              </Typography>
 
-            <Typography variant="body2">
-              O UnB Ágil calcula quais disciplinas você deve priorizar em cada
-              semestre.
-            </Typography>
+              <Typography variant="body2">
+                O UnB Ágil calcula quais disciplinas você deve priorizar em cada
+                semestre.
+              </Typography>
+            </Box>
+
+            <Image src="flowchart.svg" alt="Flowchart" width={68} height={68} />
           </Box>
+        </CardContent>
+      </Card>
 
-          <Image src="flowchart.svg" alt="Flowchart" width={68} height={68} />
-        </Box>
-      </CardContent>
-    </Card>
+      <Alert severity="info" variant="outlined">
+        <Typography variant="body2">
+          Ainda estamos em testes apenas com o curso de{' '}
+          <strong>Engenharia de Software</strong>.{' '}
+          <Link href="/waitlist" passHref>
+            Entre na lista de espera
+          </Link>
+          .
+        </Typography>
+      </Alert>
+    </>
   );
 }
