@@ -14,6 +14,8 @@ class AcademicHistoryFile {
       curriculumSigaaId: '',
       components: {
         completed: [],
+        enrolled: [],
+        equivalentEnrolled: [],
         remaining: [],
       },
       workloads: {
@@ -120,8 +122,7 @@ class AcademicHistoryFile {
   }
 
   private handleCompletedComponentRow(row: string[]) {
-    const isCompletedComponentRow =
-      row.at(-1) === 'APR' || row.at(-1) === 'DISP';
+    const isCompletedComponentRow = row.at(-1)?.match(/APR|DISP|CUMP/);
 
     if (!isCompletedComponentRow) {
       return;
@@ -150,6 +151,24 @@ class AcademicHistoryFile {
     this.academicHistory.components.completed.push(componentSigaaId);
   }
 
+  private handleEnrolledComponentRow(row: string[]) {
+    const isEnrolledComponentRow = row.at(-1) === 'MATR';
+
+    if (!isEnrolledComponentRow) {
+      return;
+    }
+
+    const componentSigaaId = row
+      .slice(1, 3)
+      .find((element) => element.match(/[A-Z]+\d+/));
+
+    if (!componentSigaaId) {
+      return;
+    }
+
+    this.academicHistory.components.enrolled.push(componentSigaaId);
+  }
+
   private handleRemainingComponentRow(row: string[]) {
     const isLastColumnWorkload = row.at(-1)?.match(/\d+ h$/);
     const hasRowLength = row.length === 3 || row.length === 4;
@@ -160,7 +179,15 @@ class AcademicHistoryFile {
     }
 
     const componentSigaaId = row[0];
-    this.academicHistory.components.remaining.push(componentSigaaId);
+
+    if (row.length === 3) {
+      this.academicHistory.components.remaining.push(componentSigaaId);
+      return;
+    }
+
+    if (row[2] === 'Matriculado em Equivalente') {
+      this.academicHistory.components.equivalentEnrolled.push(componentSigaaId);
+    }
   }
 
   async extract(): Promise<AcademicHistory> {
@@ -178,6 +205,7 @@ class AcademicHistoryFile {
           this.handleWorkloadRow(row);
           this.handleCompletedComponentRow(row);
           this.handleEquivalentComponentRow(row);
+          this.handleEnrolledComponentRow(row);
           this.handleRemainingComponentRow(row);
         });
 

@@ -5,7 +5,7 @@ import ComponentRepository from '@/repositories/ComponentRepository';
 import CurriculumComponentRepository from '@/repositories/CurriculumComponentRepository';
 import RequisitesGraph from './graph';
 
-interface RecommendationOptions {
+export interface RecommendationOptions {
   maxWorkloadByPeriod: number;
 }
 
@@ -13,16 +13,19 @@ export default class Recommendation {
   public recommendation: Component[][] = [];
 
   private curriculum: Curriculum;
+  private enrolledComponentIds: Component['sigaaId'][];
   private graph: RequisitesGraph;
   private maxWorkloadByPeriod: number;
   private pathLengths = new Map<Component['sigaaId'], number>();
 
   constructor(
     curriculum: Curriculum,
+    enrolledComponentIds: Component['sigaaId'][],
     graph: RequisitesGraph,
     options: RecommendationOptions,
   ) {
     this.curriculum = curriculum;
+    this.enrolledComponentIds = enrolledComponentIds;
     this.graph = graph;
     this.maxWorkloadByPeriod = options.maxWorkloadByPeriod;
 
@@ -32,6 +35,12 @@ export default class Recommendation {
   public async generate() {
     const components = await this.getPrioritizedComponents();
     components.forEach((component) => this.insert(component));
+
+    const enrolledComponents = await ComponentRepository.findBy({
+      sigaaId: In(this.enrolledComponentIds),
+    });
+
+    this.recommendation.unshift(enrolledComponents);
   }
 
   private async getRecommendationComponents() {

@@ -13,6 +13,8 @@ export interface Workloads {
 
 export interface Components {
   completed: string[];
+  enrolled: string[];
+  equivalentEnrolled: string[];
   remaining: string[];
 }
 

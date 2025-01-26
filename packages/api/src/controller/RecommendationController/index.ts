@@ -2,11 +2,7 @@ import { Request } from 'express';
 import { AcademicHistory } from '@unb-agil/academic-history';
 import CurriculumRepository from '@/repositories/CurriculumRepository';
 import RequisitesGraph from './graph';
-import Recommendation from './recommendation';
-
-interface RecommendationOptions {
-  maxWorkloadByPeriod?: string;
-}
+import Recommendation, { RecommendationOptions } from './recommendation';
 
 type RecommendationRequest = Request<
   never,
@@ -18,22 +14,38 @@ export default class RecommendationController {
   async recommend(request: RecommendationRequest) {
     const {
       curriculumSigaaId,
-      components: { completed, remaining },
+      components: { completed, enrolled, equivalentEnrolled, remaining },
     } = request.body;
 
-    const maxWorkloadByPeriod = request.query.maxWorkloadByPeriod
-      ? parseInt(request.query.maxWorkloadByPeriod as string)
+    const { maxWorkloadByPeriod } = request.query;
+
+    const parsedMaxWorkloadByPeriod = maxWorkloadByPeriod
+      ? parseInt(maxWorkloadByPeriod as string)
       : Infinity;
 
     const curriculum = await CurriculumRepository.findOneBy({
       sigaaId: curriculumSigaaId,
     });
 
-    const graph = new RequisitesGraph(curriculum, completed, remaining);
+    const graph = new RequisitesGraph(
+      curriculum,
+      completed,
+      enrolled.concat(equivalentEnrolled),
+      remaining,
+    );
+
     await graph.generate();
 
-    const options = { maxWorkloadByPeriod };
-    const recommendation = new Recommendation(curriculum, graph, options);
+    const options = {
+      maxWorkloadByPeriod: parsedMaxWorkloadByPeriod,
+    };
+
+    const recommendation = new Recommendation(
+      curriculum,
+      enrolled,
+      graph,
+      options,
+    );
     await recommendation.generate();
 
     return recommendation.recommendation;

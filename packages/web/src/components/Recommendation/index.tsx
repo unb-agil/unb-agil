@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import RecommendationCard from '@/components/Recommendation/Card';
 
@@ -10,13 +10,24 @@ export default function Recommendation() {
   }
 
   return (
-    <Box display="flex" flexDirection="column" gap={5}>
+    <Box display="flex" flexDirection="column" pt={3} pb={5}>
       {recommendation.map((period, index) => (
-        <Box key={index} display="flex" flexDirection="column" gap={2}>
-          <Box key={index} display="flex" alignItems="center" gap={2}>
-            <Typography variant="h5">Período {index + 1}</Typography>
+        <Box key={index}>
+          <Box
+            mt={index === 0 ? 0 : 2}
+            mb={2}
+            display="flex"
+            alignItems="center"
+            gap={2}
+          >
+            <Typography variant="body1" fontWeight={700}>
+              {index === 0
+                ? 'Período atual'
+                : `Período nº
+              ${index}`}
+            </Typography>
 
-            <Divider sx={{ flexGrow: 1 }} />
+            <Box flexGrow={1} />
 
             <Typography variant="body1" color="textSecondary">
               {period.reduce(
@@ -32,9 +43,15 @@ export default function Recommendation() {
             </Typography>
           </Box>
 
-          {period.map((component) => (
-            <RecommendationCard key={component.sigaaId} component={component} />
-          ))}
+          <Box display="flex" flexDirection="column" gap={1}>
+            {period.map((component) => (
+              <RecommendationCard
+                key={component.sigaaId}
+                component={component}
+                currentPeriod={index === 0}
+              />
+            ))}
+          </Box>
         </Box>
       ))}
     </Box>

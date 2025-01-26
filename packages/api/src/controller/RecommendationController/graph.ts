@@ -9,16 +9,19 @@ import ComponentRepository from '@/repositories/ComponentRepository';
 export default class RequisitesGraph {
   private curriculum: Curriculum;
   private completedComponentIds: Component['sigaaId'][];
+  private enrolledComponentIds: Component['sigaaId'][];
   private remainingComponentIds: Component['sigaaId'][];
   private graph = new Map<Component['sigaaId'], Component['sigaaId'][]>();
 
   constructor(
     curriculum: Curriculum,
     completedComponentsIds: Component['sigaaId'][],
+    enrolledComponentsIds: Component['sigaaId'][],
     remainingComponentsIds: Component['sigaaId'][],
   ) {
     this.curriculum = curriculum;
     this.completedComponentIds = completedComponentsIds;
+    this.enrolledComponentIds = enrolledComponentsIds;
     this.remainingComponentIds = remainingComponentsIds;
   }
 
@@ -199,6 +202,10 @@ export default class RequisitesGraph {
         this.graph.set(key, Array.from(existingComponents));
       }
     };
+
+    if (this.enrolledComponentIds.includes(componentSigaaId)) {
+      return;
+    }
 
     if (!prerequisiteSigaaIds || prerequisiteSigaaIds.length === 0) {
       addComponentToGraph('ROOT', componentSigaaId);

@@ -4,13 +4,22 @@ import { Component } from '@/models/entities';
 
 interface RecommendationCardProps {
   component: Component;
+  currentPeriod?: boolean;
 }
 
 export default function RecommendationCard({
   component,
+  currentPeriod,
 }: RecommendationCardProps) {
   return (
-    <Box px={2} py={1} borderRadius={1} bgcolor="white">
+    <Box
+      px={2}
+      py={1}
+      borderRadius={1}
+      bgcolor={currentPeriod ? 'transparent' : 'white'}
+      border={currentPeriod ? 1 : 0}
+      borderColor="primary.light"
+    >
       <Box display="flex" alignItems="center" gap={1}>
         <Typography variant="caption" color="textSecondary">
           {component.sigaaId} — {component.totalWorkload}h (
@@ -18,7 +27,7 @@ export default function RecommendationCard({
         </Typography>
       </Box>
 
-      <Typography sx={{ flexGrow: 1 }} variant="h6" fontWeight={500}>
+      <Typography sx={{ flexGrow: 1 }} variant="body1" fontWeight={500}>
         {capitalize(component.title, ['para', 'à'])}
       </Typography>
     </Box>
