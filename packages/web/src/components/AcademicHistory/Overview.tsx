@@ -7,7 +7,7 @@ function getPercentageLabel(value: number, total: number) {
     return null;
   }
 
-  return ((value / total) * 100).toFixed(2).replace('.', ',');
+  return Math.round((value / total) * 100);
 }
 
 export default function AcademicHistoryOverview() {
@@ -19,11 +19,22 @@ export default function AcademicHistoryOverview() {
     }
 
     const {
-      workloads: { completed, required },
+      workloads: { required, completed },
     } = academicHistory;
 
+    const totalRequired = required.mandatory + required.elective;
+    const cappedCompletedElective = Math.min(
+      required.elective,
+      completed.elective,
+    );
+    const cappedCompletedMandatory = Math.min(
+      required.mandatory,
+      completed.mandatory,
+    );
+    const totalCompleted = cappedCompletedElective + cappedCompletedMandatory;
+
     const percentage = {
-      total: getPercentageLabel(completed.total, required.total),
+      total: getPercentageLabel(totalCompleted, totalRequired),
       mandatory: getPercentageLabel(completed.mandatory, required.mandatory),
       elective: getPercentageLabel(completed.elective, required.elective),
       complementary: getPercentageLabel(
@@ -59,7 +70,10 @@ export default function AcademicHistoryOverview() {
             Obrigatórias: <strong>{percentage?.mandatory}%</strong>
           </Typography>
           <Typography variant="body2">
-            Optativas: <strong>{percentage?.elective}%</strong>
+            Optativas: <strong>{percentage?.elective}%</strong>{' '}
+            {percentage?.elective &&
+              percentage?.elective > 100 &&
+              '(fez mais do que o exigido)'}
           </Typography>
 
           {percentage?.complementary && (
