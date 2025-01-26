@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { Box, Grid2, Paper, Typography } from '@mui/material';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
@@ -11,6 +12,12 @@ import Link from 'next/link';
 
 export default function Home() {
   const { academicHistory, recommendation } = useAcademicHistoryContext();
+
+  useEffect(() => {
+    if (recommendation) {
+      window.scrollTo(0, 0);
+    }
+  }, [recommendation]);
 
   if (recommendation) {
     return <Recommendation />;
