@@ -1,10 +1,10 @@
+import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 
-// import { AppDataSource } from '#data-source.js';
 import { AppDataSource } from '#data-source.js';
 import { Routes } from '#routes.js';
 
@@ -41,8 +41,7 @@ AppDataSource.initialize()
       );
     });
 
-    app.listen(3000);
-
-    console.log('Express server has started on port 3000.');
+    app.listen(process.env.API_PORT);
+    console.log(`Server started at http://localhost:${process.env.API_PORT}`);
   })
   .catch((error) => console.log(error));

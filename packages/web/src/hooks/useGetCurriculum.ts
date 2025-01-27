@@ -14,7 +14,7 @@ export default function useGetCurriculum(sigaaId?: string) {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:3000/curricula?sigaaId=${sigaaId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/curricula?sigaaId=${sigaaId}`, {
       method: 'GET',
     })
       .then((response) => {

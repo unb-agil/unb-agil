@@ -35,7 +35,7 @@ export default function useGetComponents() {
       }
 
       fetch(
-        `http://localhost:3000/curricula-components/search?${searchParams}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/curricula-components/search?${searchParams}`,
         {
           method: 'GET',
         },

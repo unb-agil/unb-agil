@@ -33,7 +33,7 @@ export default function Hero() {
         <Typography variant="body2">
           Ainda estamos em testes apenas com o curso de{' '}
           <strong>Engenharia de Software</strong>.{' '}
-          <Link href="/waitlist" passHref>
+          <Link href="https://forms.gle/F732P3vu6ot9cJVg6" target="_blank">
             Entre na lista de espera
           </Link>
           .

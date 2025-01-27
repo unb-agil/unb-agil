@@ -119,7 +119,10 @@ export default function AcademicHistoryUpload() {
 
               <Typography variant="body2" marginTop={2}>
                 Entre na{' '}
-                <Link href="/waitlist" passHref>
+                <Link
+                  href="https://forms.gle/F732P3vu6ot9cJVg6"
+                  target="_blank"
+                >
                   lista de espera
                 </Link>{' '}
                 para ser notificado quando seu curso estiver disponível.

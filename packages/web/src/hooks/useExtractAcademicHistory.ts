@@ -14,7 +14,7 @@ export default function useExtractAcademicHistory() {
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('http://localhost:3000/academic-history', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/academic-history`, {
       method: 'POST',
       body: formData,
     })

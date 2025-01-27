@@ -25,6 +25,7 @@
     "@types/multer": "^1.4.11",
     "@unb-agil/eslint-config": "*",
     "@unb-agil/typescript-config": "*",
+    "dotenv": "^16.4.7",
     "nodemon": "^3.1.9"
   },
   "imports": {

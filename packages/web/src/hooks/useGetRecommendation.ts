@@ -23,13 +23,16 @@ export default function useGetRecommendation() {
         searchParams.append(key, value);
       }
 
-      fetch(`http://localhost:3000/recommendation?${searchParams}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/recommendation?${searchParams}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(academicHistory),
         },
-        body: JSON.stringify(academicHistory),
-      })
+      )
         .then((response) => {
           if (!response.ok) {
             throw new Error('Falha ao ler histórico acadêmico');
