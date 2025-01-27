@@ -1,10 +1,9 @@
 {
   "name": "@unb-agil/academic-history",
   "version": "1.0.0",
-  "main": "src/index.ts",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "build": "tsc"
   },
   "devDependencies": {
     "@unb-agil/eslint-config": "*",
@@ -12,5 +11,11 @@
   },
   "dependencies": {
     "pdf2table": "^0.0.2"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
   }
 }

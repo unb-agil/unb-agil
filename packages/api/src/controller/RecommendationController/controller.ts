@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { AcademicHistory } from '@unb-agil/academic-history';
-import CurriculumRepository from '@/repositories/CurriculumRepository';
+import CurriculumRepository from '#repositories/CurriculumRepository.js';
 import RequisitesGraph from './graph';
 import Recommendation, { RecommendationOptions } from './recommendation';
 

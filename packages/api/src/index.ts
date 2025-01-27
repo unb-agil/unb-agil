@@ -4,8 +4,9 @@ import cors from 'cors';
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 
-import { AppDataSource } from '@/data-source';
-import { Routes } from '@/routes';
+// import { AppDataSource } from '#data-source.js';
+import { AppDataSource } from '#data-source.js';
+import { Routes } from '#routes.js';
 
 const upload = multer({ dest: 'uploads/' });
 

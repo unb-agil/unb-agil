@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
-import { RequisitesExpression } from '@unb-agil/requisites-parser';
-import Department from '@/entity/Department';
-import CurriculumComponent from '@/entity/CurriculumComponent';
+import type { RequisitesExpression } from '@unb-agil/requisites-parser';
+import Department from '#entity/Department.js';
+import CurriculumComponent from '#entity/CurriculumComponent.js';
 
 export enum ComponentType {
   COURSE = 'COURSE',

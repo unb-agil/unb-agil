@@ -1,17 +1,14 @@
 {
-  "ts-node": {
-    "require": ["tsconfig-paths/register", "dotenv/config"],
-    "files": true
-  },
   "compilerOptions": {
-    "target": "esnext",
-    "module": "commonjs",
-    "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "target": "es2022",
+    "allowJs": true,
     "resolveJsonModule": true,
+    "moduleDetection": "force",
     "isolatedModules": true,
-    "noEmit": true
+    "strict": false,
+    "noUncheckedIndexedAccess": true,
+    "module": "NodeNext"
   }
 }

@@ -1,17 +1,14 @@
 {
-  "name": "unb-agil",
-  "version": "1.0.0",
-  "main": "index.js",
   "private": true,
-  "type": "module",
+  "packageManager": "yarn@1.22.22",
   "workspaces": [
     "packages/*"
   ],
-  "authors": [
-    "Irwin Schmitt <irwinschmitt@gmail.com>",
-    "João Paulo Coelho <atualizar@hotmail.com>"
-  ],
-  "license": "MIT",
+  "scripts": {
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "prepare": "husky"
+  },
   "devDependencies": {
     "@commitlint/cli": "^19.4.0",
     "@commitlint/config-conventional": "^19.2.2",
@@ -19,10 +16,8 @@
     "@unb-agil/eslint-config": "*",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.8",
+    "turbo": "^2.3.4",
     "typescript": "^5.5.4"
-  },
-  "scripts": {
-    "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --fix"

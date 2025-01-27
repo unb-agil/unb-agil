@@ -1,5 +1,5 @@
-import { AppDataSource } from '@/data-source';
-import CurriculumComponent from '@/entity/CurriculumComponent';
+import { AppDataSource } from '#data-source.js';
+import CurriculumComponent from '#entity/CurriculumComponent.js';
 
 const CurriculumComponentRepository = AppDataSource.getRepository(
   CurriculumComponent,

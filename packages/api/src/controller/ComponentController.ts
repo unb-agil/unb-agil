@@ -1,6 +1,6 @@
 import { Request } from 'express';
-import { AppDataSource } from '@/data-source';
-import Component from '@/entity/Component';
+import { AppDataSource } from '#data-source.js';
+import Component from '#entity/Component.js';
 
 class ComponentController {
   private repository = AppDataSource.getRepository(Component);

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
-import Program from '@/entity/Program';
-import Component from '@/entity/Component';
+import Program from '#entity/Program.js';
+import Component from '#entity/Component.js';
 
 @Entity()
 class Department {

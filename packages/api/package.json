@@ -4,8 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --exec ts-node src/index.ts",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "start": "node dist/index.js",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "build": "tsc"
   },
   "dependencies": {
     "@unb-agil/academic-history": "*",
@@ -25,5 +26,8 @@
     "@unb-agil/eslint-config": "*",
     "@unb-agil/typescript-config": "*",
     "nodemon": "^3.1.9"
+  },
+  "imports": {
+    "#*": "./dist/*"
   }
 }

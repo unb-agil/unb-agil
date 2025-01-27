@@ -1,8 +1,8 @@
 import { In } from 'typeorm';
-import Component from '@/entity/Component';
-import Curriculum from '@/entity/Curriculum';
-import ComponentRepository from '@/repositories/ComponentRepository';
-import CurriculumComponentRepository from '@/repositories/CurriculumComponentRepository';
+import Component from '#entity/Component.js';
+import Curriculum from '#entity/Curriculum.js';
+import ComponentRepository from '#repositories/ComponentRepository.js';
+import CurriculumComponentRepository from '#repositories/CurriculumComponentRepository.js';
 import RequisitesGraph from './graph';
 
 export interface RecommendationOptions {

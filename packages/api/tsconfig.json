@@ -1,15 +1,14 @@
 {
   "extends": "@unb-agil/typescript-config/tsconfig.base.json",
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "outDir": "./dist",
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": true,
-    "strict": false,
+    "emitDecoratorMetadata": true,
+    "outDir": "dist",
+    "rootDir": "src",
     "paths": {
-      "@/*": ["./src/*"]
+      "#*": ["./src/*"]
     }
-  }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

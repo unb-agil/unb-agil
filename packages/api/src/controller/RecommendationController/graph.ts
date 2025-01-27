@@ -1,10 +1,10 @@
 import { In } from 'typeorm';
 import requisites, { RequisitesExpression } from '@unb-agil/requisites-parser';
-import Component from '@/entity/Component';
-import Curriculum from '@/entity/Curriculum';
-import { CurriculumComponentType } from '@/entity/CurriculumComponent';
-import CurriculumComponentRepository from '@/repositories/CurriculumComponentRepository';
-import ComponentRepository from '@/repositories/ComponentRepository';
+import Component from '#entity/Component.js';
+import Curriculum from '#entity/Curriculum.js';
+import { CurriculumComponentType } from '#entity/CurriculumComponent.js';
+import CurriculumComponentRepository from '#repositories/CurriculumComponentRepository.js';
+import ComponentRepository from '#repositories/ComponentRepository.js';
 
 export default class RequisitesGraph {
   private curriculum: Curriculum;

@@ -1,7 +1,7 @@
 import { Request } from 'express';
-import { AppDataSource } from '@/data-source';
-import Program from '@/entity/Program';
-import Curriculum from '@/entity/Curriculum';
+import { AppDataSource } from '#data-source.js';
+import Program from '#entity/Program.js';
+import Curriculum from '#entity/Curriculum.js';
 
 class CurriculumController {
   private repository = AppDataSource.getRepository(Curriculum);

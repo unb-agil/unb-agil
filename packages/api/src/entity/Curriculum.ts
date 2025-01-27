@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, PrimaryColumn, OneToMany } from 'typeorm';
-import Program from '@/entity/Program';
-import CurriculumComponent from '@/entity/CurriculumComponent';
+import Program from '#entity/Program.js';
+import CurriculumComponent from '#entity/CurriculumComponent.js';
 
 @Entity()
 class Curriculum {

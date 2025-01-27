@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 
-import Department from '@/entity/Department';
-import Program from '@/entity/Program';
-import Curriculum from '@/entity/Curriculum';
-import CurriculumComponent from '@/entity/CurriculumComponent';
-import Component from '@/entity/Component';
+import Department from '#entity/Department.js';
+import Program from '#entity/Program.js';
+import Curriculum from '#entity/Curriculum.js';
+import CurriculumComponent from '#entity/CurriculumComponent.js';
+import Component from '#entity/Component.js';
 
 export const AppDataSource = new DataSource({
   type: 'mysql',

@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, PrimaryColumn, OneToMany } from 'typeorm';
-import Department from '@/entity/Department';
-import Curriculum from '@/entity/Curriculum';
+import Department from '#entity/Department.js';
+import Curriculum from '#entity/Curriculum.js';
 
 export enum Degree {
   BACHELOR = 'BACHELOR',

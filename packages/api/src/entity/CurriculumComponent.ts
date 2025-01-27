@@ -5,8 +5,8 @@ import {
   ManyToOne,
   Unique,
 } from 'typeorm';
-import Curriculum from '@/entity/Curriculum';
-import Component from '@/entity/Component';
+import Curriculum from '#entity/Curriculum.js';
+import Component from '#entity/Component.js';
 
 export enum CurriculumComponentType {
   MANDATORY = 'MANDATORY',

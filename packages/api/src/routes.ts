@@ -1,10 +1,10 @@
-import DepartmentController from '@/controller/DepartmentController';
-import ProgramController from '@/controller/ProgramController';
-import CurriculumController from '@/controller/CurriculumController';
-import CurriculumComponentController from '@/controller/CurriculumComponentController';
-import ComponentController from '@/controller/ComponentController';
-import AcademicHistoryController from '@/controller/AcademicHistoryController';
-import RecommendationController from '@/controller/RecommendationController';
+import DepartmentController from '#controller/DepartmentController.js';
+import ProgramController from '#controller/ProgramController.js';
+import CurriculumController from '#controller/CurriculumController.js';
+import CurriculumComponentController from '#controller/CurriculumComponentController.js';
+import ComponentController from '#controller/ComponentController.js';
+import AcademicHistoryController from '#controller/AcademicHistoryController.js';
+import RecommendationController from '#controller/RecommendationController/controller.js';
 
 export const Routes = [
   {
