@@ -1,20 +1,20 @@
 import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
-import puppeteerSetup from '@/config/puppeteer';
-import BaseScraper from '@/scrapers/baseScraper';
-import ProgramService from '@/services/programService';
-import DepartmentService from '@/services/departmentService';
+import puppeteerSetup from '#config/puppeteer.js';
+import BaseScraper from '#scrapers/baseScraper.js';
+import ProgramService from '#services/programService.js';
+import DepartmentService from '#services/departmentService.js';
 import {
   GRADUATION_PROGRAMS_URL,
   PROGRAM_CURRICULA_URL,
   PROGRAM_PRESENTATION_URL,
-} from '@/constants';
+} from '#constants.js';
 import {
   Program,
   ProgramData,
   ProgramScraperOptions,
-} from '@/models/programModels';
+} from '#models/programModels.js';
 
 class ProgramScraper implements BaseScraper {
   private programSigaaIds: number[];

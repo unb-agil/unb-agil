@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import axiosInstance from '@/config/axiosConfig';
-import { Department, DepartmentParams } from '@/models/departmentModels';
+import axiosInstance from '#config/axiosConfig.js';
+import { Department, DepartmentParams } from '#models/departmentModels.js';
 
 const log = (message: string) => console.log(chalk.greenBright(message));
 const bold = (message: string | number) => chalk.bold(message);

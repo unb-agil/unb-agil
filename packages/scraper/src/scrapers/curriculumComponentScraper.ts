@@ -1,18 +1,18 @@
 import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
-import BaseScraper from '@/scrapers/baseScraper';
-import ProgramScraper from '@/scrapers/programScraper';
-import CurriculumScraper from '@/scrapers/curriculumScraper';
-import CurriculumService from '@/services/curriculumService';
-import ComponentService from '@/services/componentService';
-import CurriculumComponentService from '@/services/curriculumComponentService';
-import { Curriculum } from '@/models/curriculumModels';
+import BaseScraper from '#scrapers/baseScraper.js';
+import ProgramScraper from '#scrapers/programScraper.js';
+import CurriculumScraper from '#scrapers/curriculumScraper.js';
+import CurriculumService from '#services/curriculumService.js';
+import ComponentService from '#services/componentService.js';
+import CurriculumComponentService from '#services/curriculumComponentService.js';
+import { Curriculum } from '#models/curriculumModels.js';
 import {
   CurriculumComponent,
   CurriculumComponentScraperOptions,
-} from '@/models/curriculumComponentModels';
-import { Program } from '@/models/programModels';
+} from '#models/curriculumComponentModels.js';
+import { Program } from '#models/programModels.js';
 
 class CurriculumComponentScraper implements BaseScraper {
   private programSigaaId: Program['sigaaId'];

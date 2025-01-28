@@ -1,16 +1,16 @@
 import chalk from 'chalk';
 import { Page } from 'puppeteer';
 
-import puppeteerSetup from '@/config/puppeteer';
-import BaseScraper from '@/scrapers/baseScraper';
-import ComponentScraper from '@/scrapers/componentScraper';
-import DepartmentService from '@/services/departmentService';
-import { DEPARTMENT_PRESENTATION_BASE_URL } from '@/constants';
+import puppeteerSetup from '#config/puppeteer.js';
+import BaseScraper from '#scrapers/baseScraper.js';
+import ComponentScraper from '#scrapers/componentScraper.js';
+import DepartmentService from '#services/departmentService.js';
+import { DEPARTMENT_PRESENTATION_BASE_URL } from '#constants.js';
 import {
   Department,
   DepartmentData,
   DepartmentScraperOptions,
-} from '@/models/departmentModels';
+} from '#models/departmentModels';
 
 class DepartmentScraper implements BaseScraper {
   private departmentSigaaIds: number[];

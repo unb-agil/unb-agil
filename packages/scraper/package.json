@@ -3,17 +3,21 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "scrape": "ts-node src/index.ts",
+    "scrape": "node dist/index.js",
     "build": "tsc"
   },
   "dependencies": {
+    "@unb-agil/requisites-parser": "*",
     "axios": "^1.7.4",
     "chalk": "4",
-    "puppeteer": "^22.14.0",
-    "@unb-agil/requisites-parser": "*"
+    "dotenv": "^16.4.7",
+    "puppeteer": "^22.14.0"
   },
   "devDependencies": {
     "@types/puppeteer": "^7.0.4",
     "@unb-agil/typescript-config": "*"
+  },
+  "imports": {
+    "#*": "./dist/*"
   }
 }

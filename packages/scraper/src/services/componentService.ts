@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import axiosInstance from '@/config/axiosConfig';
-import { Component } from '@/models/componentModels';
+import axiosInstance from '#config/axiosConfig.js';
+import { Component } from '#models/componentModels.js';
 
 const log = (message: string) => console.log(chalk.cyanBright(message));
 const bold = (message: string | number) => chalk.bold(message);

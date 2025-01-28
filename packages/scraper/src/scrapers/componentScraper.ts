@@ -3,19 +3,19 @@ import { Page } from 'puppeteer';
 
 import requisites from '@unb-agil/requisites-parser';
 
-import puppeteerSetup from '@/config/puppeteer';
-import BaseScraper from '@/scrapers/baseScraper';
-import ProgramScraper from '@/scrapers/programScraper';
-import CurriculumScraper from '@/scrapers/curriculumScraper';
-import CurriculumComponentScraper from '@/scrapers/curriculumComponentScraper';
-import DepartmentService from '@/services/departmentService';
-import ComponentService from '@/services/componentService';
-import { COMPONENTS_LINK } from '@/constants';
+import puppeteerSetup from '#config/puppeteer.js';
+import BaseScraper from '#scrapers/baseScraper.js';
+import ProgramScraper from '#scrapers/programScraper.js';
+import CurriculumScraper from '#scrapers/curriculumScraper.js';
+import CurriculumComponentScraper from '#scrapers/curriculumComponentScraper.js';
+import DepartmentService from '#services/departmentService.js';
+import ComponentService from '#services/componentService.js';
+import { COMPONENTS_LINK } from '#constants.js';
 import {
   Component,
   ComponentScraperOptions,
   ComponentType,
-} from '@/models/componentModels';
+} from '#models/componentModels.js';
 
 class ComponentScraper implements BaseScraper {
   private programSigaaId?: number;

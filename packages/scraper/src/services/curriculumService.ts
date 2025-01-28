@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import { Program } from '@/models/programModels';
-import { Curriculum } from '@/models/curriculumModels';
-import axiosInstance from '@/config/axiosConfig';
+import { Program } from '#models/programModels.js';
+import { Curriculum } from '#models/curriculumModels.js';
+import axiosInstance from '#config/axiosConfig.js';
 
 const log = (message: string) => console.log(chalk.blueBright(message));
 const bold = (message: string | number) => chalk.bold(message);

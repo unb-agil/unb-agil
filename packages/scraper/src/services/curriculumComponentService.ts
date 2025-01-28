@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import axiosInstance from '@/config/axiosConfig';
-import { CurriculumComponent } from '@/models/curriculumComponentModels';
+import axiosInstance from '#config/axiosConfig.js';
+import { CurriculumComponent } from '#models/curriculumComponentModels.js';
 
 const log = (message: string) => console.log(chalk.magentaBright(message));
 const bold = (message: string | number) => chalk.bold(message);

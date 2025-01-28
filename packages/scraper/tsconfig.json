@@ -2,8 +2,9 @@
   "extends": "@unb-agil/typescript-config/tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
     "paths": {
-      "@/*": ["./src/*"]
+      "#*": ["./src/*"]
     }
   },
   "include": ["src"],

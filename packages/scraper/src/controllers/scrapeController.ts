@@ -1,11 +1,11 @@
-import puppeteerSetup from '@/config/puppeteer';
-import BaseScraper from '@/scrapers/baseScraper';
-import DepartmentScraper from '@/scrapers/departmentScraper';
-import ProgramScraper from '@/scrapers/programScraper';
-import CurriculumScraper from '@/scrapers/curriculumScraper';
-import CurriculumComponentScraper from '@/scrapers/curriculumComponentScraper';
-import ComponentScraper from '@/scrapers/componentScraper';
-import { COMPONENTS_LINK } from '@/constants';
+import puppeteerSetup from '#config/puppeteer.js';
+import BaseScraper from '#scrapers/baseScraper.js';
+import DepartmentScraper from '#scrapers/departmentScraper.js';
+import ProgramScraper from '#scrapers/programScraper.js';
+import CurriculumScraper from '#scrapers/curriculumScraper.js';
+import CurriculumComponentScraper from '#scrapers/curriculumComponentScraper.js';
+import ComponentScraper from '#scrapers/componentScraper.js';
+import { COMPONENTS_LINK } from '#constants.js';
 
 class ScrapeController {
   static async closeCookiesDialog() {

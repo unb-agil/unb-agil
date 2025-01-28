@@ -1,4 +1,5 @@
-import ScrapeController from '@/controllers/scrapeController';
+import 'dotenv/config';
+import ScrapeController from '#controllers/scrapeController.js';
 
 // const FGA_DEPARTMENT_ID = 673;
 const ESW_PROGRAM_ID = 414924;
