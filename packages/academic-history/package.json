@@ -6,7 +6,6 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "@unb-agil/eslint-config": "*",
     "@unb-agil/typescript-config": "*"
   },
   "dependencies": {
