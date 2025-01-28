@@ -29,6 +29,12 @@
     },
     "start": {
       "dependsOn": ["^start"]
+    },
+    "test": {
+      "outputs": []
+    },
+    "test:watch": {
+      "cache": false
     }
   }
 }
