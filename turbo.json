@@ -5,6 +5,24 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
+    "web#build": {
+      "dependsOn": ["^build"],
+      "env": ["NEXT_PUBLIC_API_URL"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "api#build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "MYSQL_HOST",
+        "MYSQL_PORT",
+        "MYSQL_ROOT_PASSWORD",
+        "MYSQL_USER",
+        "MYSQL_PASSWORD",
+        "MYSQL_DATABASE",
+        "API_PORT"
+      ],
+      "outputs": ["dist/**"]
+    },
     "dev": {
       "persistent": true,
       "cache": false
