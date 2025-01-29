@@ -37,7 +37,6 @@ export default function useExtractAcademicHistory() {
   }, []);
 
   const reset = () => {
-    console.log('reset');
     setLoading(false);
     setError(null);
     setData(null);

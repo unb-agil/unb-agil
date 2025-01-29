@@ -86,7 +86,6 @@ export default function AcademicHistoryForm() {
     _event: SyntheticEvent<Element, Event>,
     value: Component[],
   ) => {
-    console.log('handleAutocompleteChange', value);
     setSelectedElectives(value);
   };
 
