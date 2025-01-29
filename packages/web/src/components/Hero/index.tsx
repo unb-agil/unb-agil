@@ -1,6 +1,5 @@
-import { Alert, Box, Card, CardContent, Typography } from '@mui/material';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Box, Card, CardContent, Typography } from '@mui/material';
 
 export default function Hero() {
   return (
@@ -28,17 +27,6 @@ export default function Hero() {
           </Box>
         </CardContent>
       </Card>
-
-      <Alert severity="info" variant="outlined">
-        <Typography variant="body2">
-          Ainda estamos em testes apenas com o curso de{' '}
-          <strong>Engenharia de Software</strong>.{' '}
-          <Link href="https://forms.gle/F732P3vu6ot9cJVg6" target="_blank">
-            Entre na lista de espera
-          </Link>
-          .
-        </Typography>
-      </Alert>
     </>
   );
 }
