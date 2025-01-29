@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import RecommendationCard from '@/components/Recommendation/Card';
 
@@ -17,19 +17,18 @@ export default function Recommendation() {
             mt={index === 0 ? 0 : 2}
             mb={2}
             display="flex"
-            alignItems="center"
-            gap={2}
+            flexDirection={{ xs: 'column', sm: 'row' }}
           >
             <Typography variant="body1" fontWeight={700}>
               {index === 0
                 ? 'Período atual'
-                : `Período nº
+                : `Próximo período nº
               ${index}`}
             </Typography>
 
             <Box flexGrow={1} />
 
-            <Typography variant="body1" color="textSecondary">
+            <Typography variant="body2" color="textSecondary">
               {period.reduce(
                 (acc, component) => acc + component.totalWorkload,
                 0,
@@ -54,6 +53,18 @@ export default function Recommendation() {
           </Box>
         </Box>
       ))}
+
+      <Box display="flex" justifyContent="flex-end" mt={2}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            console.log('Implementar');
+          }}
+        >
+          Alterar opções
+        </Button>
+      </Box>
     </Box>
   );
 }
