@@ -9,8 +9,8 @@ export default function Hero() {
           <Box
             display="flex"
             justifyContent="space-between"
-            alignItems="center"
-            gap={3}
+            alignItems={{ xs: 'start', sm: 'center' }}
+            gap={1}
           >
             <Box>
               <Typography variant="body1" fontWeight={500} gutterBottom>
@@ -18,12 +18,12 @@ export default function Hero() {
               </Typography>
 
               <Typography variant="body2">
-                O UnB Ágil calcula quais disciplinas você deve priorizar em cada
-                semestre.
+                O UnB Ágil calcula e <strong>recomenda disciplinas</strong> para
+                você priorizar em cada semestre.
               </Typography>
             </Box>
 
-            <Image src="flowchart.svg" alt="Flowchart" width={68} height={68} />
+            <Image src="flowchart.svg" alt="Flowchart" width={50} height={50} />
           </Box>
         </CardContent>
       </Card>

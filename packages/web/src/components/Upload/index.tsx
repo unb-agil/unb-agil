@@ -23,16 +23,21 @@ export default function UploadContainer() {
 
       <Grid2 container spacing={4}>
         <Grid2 size={{ xs: 12, md: 4 }}>
-          <Typography variant="body2" fontWeight={700}>
-            Acesse o <Link href="https://autenticacao.unb.br">SIGAA</Link>
+          <Typography variant="body2">
+            1.{` `}
+            <Box component="span" fontWeight={700}>
+              Acesse o <Link href="https://autenticacao.unb.br">SIGAA</Link>.
+            </Box>
           </Typography>
 
-          <Paper elevation={5}>
+          <Paper sx={{ borderRadius: 2 }}>
             <Box
               mt={2}
               width="100%"
               paddingBottom="141.53%"
               position="relative"
+              borderRadius="8px"
+              overflow="hidden"
             >
               <Image src="/guide/login.png" alt="Tela de login do SIGAA" fill />
             </Box>
@@ -40,16 +45,21 @@ export default function UploadContainer() {
         </Grid2>
 
         <Grid2 size={{ xs: 12, md: 4 }}>
-          <Typography variant="body2" fontWeight={700}>
-            Clique em &quot;emitir histórico&quot;
+          <Typography variant="body2">
+            2.{' '}
+            <Box component="span" fontWeight={700}>
+              Clique em &quot;emitir histórico&quot;.
+            </Box>
           </Typography>
 
-          <Paper elevation={5}>
+          <Paper sx={{ borderRadius: 2 }}>
             <Box
               mt={2}
               width="100%"
               paddingBottom="141.53%"
               position="relative"
+              borderRadius="8px"
+              overflow="hidden"
             >
               <Image
                 src="/guide/emitir.png"
@@ -61,16 +71,21 @@ export default function UploadContainer() {
         </Grid2>
 
         <Grid2 size={{ xs: 12, md: 4 }}>
-          <Typography variant="body2" fontWeight={700}>
-            Envie o PDF para o UnB Ágil
+          <Typography variant="body2">
+            3.{' '}
+            <Box component="span" fontWeight={700}>
+              Envie o PDF para o UnB Ágil.
+            </Box>
           </Typography>
 
-          <Paper elevation={5}>
+          <Paper sx={{ borderRadius: 2 }}>
             <Box
               mt={2}
               width="100%"
               paddingBottom="141.53%"
               position="relative"
+              borderRadius="8px"
+              overflow="hidden"
             >
               <Image
                 src="/guide/historico.png"
