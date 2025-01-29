@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import RecommendationCard from '@/components/Recommendation/Card';
+import EmbeddedForm from '@/components/Recommendation/EmbeddedForm';
 
 export default function Recommendation() {
   const { recommendation, setRecommendation } = useAcademicHistoryContext();
@@ -57,6 +58,9 @@ export default function Recommendation() {
           </Box>
         </Box>
       ))}
+      <Box mt={3}>
+        <EmbeddedForm />
+      </Box>
 
       <Box display="flex" justifyContent="flex-end" mt={3}>
         <Button
