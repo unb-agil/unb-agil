@@ -3,7 +3,11 @@ import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import RecommendationCard from '@/components/Recommendation/Card';
 
 export default function Recommendation() {
-  const { recommendation } = useAcademicHistoryContext();
+  const { recommendation, setRecommendation } = useAcademicHistoryContext();
+
+  const handleChangeOptions = () => {
+    setRecommendation(null);
+  };
 
   if (!recommendation) {
     return <></>;
@@ -54,13 +58,11 @@ export default function Recommendation() {
         </Box>
       ))}
 
-      <Box display="flex" justifyContent="flex-end" mt={2}>
+      <Box display="flex" justifyContent="flex-end" mt={3}>
         <Button
           variant="contained"
           color="primary"
-          onClick={() => {
-            console.log('Implementar');
-          }}
+          onClick={handleChangeOptions}
         >
           Alterar opções
         </Button>
