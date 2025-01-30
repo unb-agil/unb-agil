@@ -8,14 +8,12 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
-  Tooltip,
 } from '@mui/material';
 import capitalize from 'capitalize-pt-br';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import useGetRecommendation from '@/hooks/useGetRecommendation';
 import useGetComponents from '@/hooks/useGetComponents';
 import useGetCurriculum from '@/hooks/useGetCurriculum';
-import { Info } from '@mui/icons-material';
 import { Component } from '@/models/entities';
 
 export default function AcademicHistoryForm() {
@@ -94,19 +92,20 @@ export default function AcademicHistoryForm() {
   }
 
   return (
-    <Box display="flex" flexDirection="column" height="100%" gap={2}>
-      <Typography variant="h5">Opções de recomendação</Typography>
+    <Box
+      p={2}
+      bgcolor="white"
+      borderRadius={1}
+      display="flex"
+      flexDirection="column"
+      height="100%"
+    >
+      <Typography variant="h6">Opções de recomendação</Typography>
 
-      <Box mt={2}>
-        <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
-          <Typography variant="body2" fontWeight={700}>
-            Carga horária máxima por período
-          </Typography>
-
-          <Tooltip title="Um crédito equivale a 15 horas.">
-            <Info color="primary" fontSize="small" />
-          </Tooltip>
-        </Box>
+      <Box mt={3.5}>
+        <Typography variant="body2" fontWeight={700}>
+          Carga horária máxima por período:
+        </Typography>
 
         <Box
           mt={1}
@@ -159,16 +158,14 @@ export default function AcademicHistoryForm() {
         </Box>
       </Box>
 
-      <Box mt={2}>
-        <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
-          <Typography variant="body2" fontWeight={700}>
-            Componentes optativos
-          </Typography>
+      <Box mt={5}>
+        <Typography variant="body2" fontWeight={700}>
+          Componentes optativos:
+        </Typography>
 
-          <Tooltip title="Todos os requisitos para cada componente serão incluídos automaticamente.">
-            <Info color="primary" fontSize="small" />
-          </Tooltip>
-        </Box>
+        <Typography variant="caption" color="textSecondary">
+          Os pré-requisitos serão incluídos automaticamente.
+        </Typography>
 
         <Autocomplete
           sx={{
@@ -226,7 +223,13 @@ export default function AcademicHistoryForm() {
 
       <Box flexGrow={1} />
 
-      <Box display="flex" flexDirection="row" justifyContent="end" gap={2}>
+      <Box
+        mt={3}
+        display="flex"
+        flexDirection="row"
+        justifyContent="end"
+        gap={2}
+      >
         <Button variant="outlined" color="primary" onClick={handleCancelClick}>
           Cancelar
         </Button>

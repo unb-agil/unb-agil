@@ -41,7 +41,11 @@ export default function WorkloadTable() {
   }, [academicHistory]);
 
   return (
-    <Box px={2} borderRadius={1} bgcolor="white">
+    <Box px={2} pt={2} borderRadius={1} bgcolor="white">
+      <Typography variant="h6" gutterBottom>
+        Visão geral
+      </Typography>
+
       <Table padding="none">
         <TableHead>
           <TableRow>

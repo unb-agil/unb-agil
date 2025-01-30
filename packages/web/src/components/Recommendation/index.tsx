@@ -10,12 +10,8 @@ export default function Recommendation() {
     setRecommendation(null);
   };
 
-  if (!recommendation) {
-    return <></>;
-  }
-
   return (
-    <Box display="flex" flexDirection="column" pt={3} pb={5}>
+    <Box display="flex" flexDirection="column" pb={5}>
       {recommendation.map((period, index) => (
         <Box key={index}>
           <Box
@@ -58,7 +54,7 @@ export default function Recommendation() {
           </Box>
         </Box>
       ))}
-      <Box mt={3}>
+      <Box mt={6}>
         <EmbeddedForm />
       </Box>
 
