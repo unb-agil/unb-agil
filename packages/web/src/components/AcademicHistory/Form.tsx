@@ -130,8 +130,8 @@ export default function AcademicHistoryForm() {
                 top: -8,
               },
             }}
-            min={curriculum?.minPeriodWorkload}
-            max={curriculum?.maxPeriodWorkload}
+            min={curriculum?.minPeriodWorkload ?? 240}
+            max={curriculum?.maxPeriodWorkload ?? 480}
             value={maxWorkloadByPeriod}
             step={15}
             valueLabelFormat={(value) => `${value}h (${value / 15} créditos)`}
@@ -158,7 +158,7 @@ export default function AcademicHistoryForm() {
         </Typography>
 
         <Typography variant="caption" color="textSecondary">
-          Os pré-requisitos serão incluídos automaticamente.
+          Os pré-requisitos serão recomendados automaticamente.
         </Typography>
 
         <Autocomplete
