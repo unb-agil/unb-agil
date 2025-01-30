@@ -20,7 +20,8 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: 'UnB Ágil',
-  description: 'Recomendação de disciplinas da UnB',
+  description:
+    'Otimize o fluxo até a sua formatura. O UnB Ágil calcula e recomenda disciplinas para você priorizar em cada semestre.',
 };
 
 export default function RootLayout({
