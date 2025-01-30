@@ -17,9 +17,7 @@ import useGetCurriculum from '@/hooks/useGetCurriculum';
 import { Component } from '@/models/entities';
 
 export default function AcademicHistoryForm() {
-  const { academicHistory, setRecommendation, setAcademicHistory } =
-    useAcademicHistoryContext();
-
+  const { academicHistory, setRecommendation } = useAcademicHistoryContext();
   const [maxWorkloadByPeriod, setMaxWorkloadByPeriod] = useState(360);
   const { recommend, data: recommendationData } = useGetRecommendation();
   const { search, data: components } = useGetComponents();
@@ -49,10 +47,6 @@ export default function AcademicHistoryForm() {
 
   const handleSliderChange = (_event: Event, newValue: number | number[]) => {
     setMaxWorkloadByPeriod(newValue as number);
-  };
-
-  const handleCancelClick = () => {
-    setAcademicHistory(null);
   };
 
   const handleOnButtonClick = () => {
@@ -223,17 +217,7 @@ export default function AcademicHistoryForm() {
 
       <Box flexGrow={1} />
 
-      <Box
-        mt={3}
-        display="flex"
-        flexDirection="row"
-        justifyContent="end"
-        gap={2}
-      >
-        <Button variant="outlined" color="primary" onClick={handleCancelClick}>
-          Cancelar
-        </Button>
-
+      <Box mt={3} display="flex" flexDirection="row" justifyContent="end">
         <Button
           variant="contained"
           color="primary"

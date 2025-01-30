@@ -1,4 +1,5 @@
 import { Box, Button, Typography } from '@mui/material';
+import { ArrowBackOutlined } from '@mui/icons-material';
 import { useAcademicHistoryContext } from '@/context/AcademicHistoryContext';
 import RecommendationCard from '@/components/Recommendation/Card';
 import EmbeddedForm from '@/components/Recommendation/EmbeddedForm';
@@ -6,12 +7,22 @@ import EmbeddedForm from '@/components/Recommendation/EmbeddedForm';
 export default function Recommendation() {
   const { recommendation, setRecommendation } = useAcademicHistoryContext();
 
-  const handleChangeOptions = () => {
+  const handleOnBackClick = () => {
     setRecommendation(null);
   };
 
   return (
     <Box display="flex" flexDirection="column" pb={5}>
+      <Box mb={3}>
+        <Button
+          variant="text"
+          color="primary"
+          startIcon={<ArrowBackOutlined />}
+          onClick={handleOnBackClick}
+        >
+          Alterar opções
+        </Button>
+      </Box>
       {recommendation.map((period, index) => (
         <Box key={index}>
           <Box
@@ -54,18 +65,9 @@ export default function Recommendation() {
           </Box>
         </Box>
       ))}
+
       <Box mt={6}>
         <EmbeddedForm />
-      </Box>
-
-      <Box display="flex" justifyContent="flex-end" mt={3}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleChangeOptions}
-        >
-          Alterar opções
-        </Button>
       </Box>
     </Box>
   );
