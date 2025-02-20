@@ -4,7 +4,9 @@
   "license": "MIT",
   "scripts": {
     "scrape": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@unb-agil/requisites-parser": "*",
@@ -14,8 +16,10 @@
     "puppeteer": "^22.14.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/puppeteer": "^7.0.4",
-    "@unb-agil/typescript-config": "*"
+    "@unb-agil/typescript-config": "*",
+    "ts-jest": "^29.2.5"
   },
   "imports": {
     "#*": "./dist/*"
